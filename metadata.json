@@ -1,0 +1,6 @@
+{
+  "name": "CSS Fonts",
+  "description": "Interactive CSS Font Tools & Web Font Generator. Preview fonts in real-time, compare web-safe fonts, generate CSS snippets, and check cross-platform browser compatibility.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
