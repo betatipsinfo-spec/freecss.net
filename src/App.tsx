@@ -8,6 +8,11 @@ import CompatibilityTable from './components/CompatibilityTable';
 import CheatSheet from './components/CheatSheet';
 import FavoritesView from './components/FavoritesView';
 import AdminDashboard from './components/AdminDashboard';
+import CompanionTools from './components/CompanionTools';
+import FAQ from './components/FAQ';
+import AboutView from './components/AboutView';
+import PrivacyView from './components/PrivacyView';
+import TermsView from './components/TermsView';
 import { ActiveTab, AppAdminConfig } from './types';
 import { Type, Sparkles, Wand2, ArrowRight } from 'lucide-react';
 
@@ -299,7 +304,31 @@ export default function App() {
               favoritesCount={favorites.length}
             />
           )}
+
+          {activeTab === 'about' && (
+            <AboutView 
+              brandName={adminConfig.brandName}
+              footerCopyrightName={adminConfig.footerCopyrightName}
+            />
+          )}
+
+          {activeTab === 'privacy' && (
+            <PrivacyView 
+              brandName={adminConfig.brandName}
+              footerCopyrightName={adminConfig.footerCopyrightName}
+            />
+          )}
+
+          {activeTab === 'terms' && (
+            <TermsView 
+              brandName={adminConfig.brandName}
+              footerCopyrightName={adminConfig.footerCopyrightName}
+            />
+          )}
         </section>
+
+        <CompanionTools />
+        <FAQ />
 
       </main>
 

@@ -21,7 +21,7 @@ export interface FontItem {
   weights: number[];
 }
 
-export type ActiveTab = 'styler' | 'directory' | 'compare' | 'compatibility' | 'cheatsheet' | 'favorites' | 'admin';
+export type ActiveTab = 'styler' | 'directory' | 'compare' | 'compatibility' | 'cheatsheet' | 'favorites' | 'admin' | 'about' | 'privacy' | 'terms';
 
 export interface AppAdminConfig {
   defaultFontSize: number;

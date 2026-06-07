@@ -1,5 +1,5 @@
 import React from 'react';
-import { Type, Sliders, Grid, Columns, Laptop, BookOpen, Sun, Moon, Menu, X, Sparkles, Heart, Shield, LogIn, ChevronDown } from 'lucide-react';
+import { Type, Sliders, Grid, Columns, Laptop, BookOpen, Sun, Moon, Menu, X, Sparkles, Heart, Shield, LogIn, ChevronDown, ExternalLink } from 'lucide-react';
 import { ActiveTab } from '../types';
 
 interface NavbarProps {
@@ -35,6 +35,15 @@ export default function Navbar({
   const toolItems = [
     { id: 'compatibility' as ActiveTab, label: 'Browser Safety', icon: Laptop, description: 'OS & device compatibility score checker' },
     { id: 'cheatsheet' as ActiveTab, label: 'CSS Cheat Sheet', icon: BookOpen, description: 'Copy-paste handy CSS font templates' },
+  ];
+
+  const designPartners = [
+    { label: 'Free Icon Gallery', url: 'https://templatemind.com/tools/icons' },
+    { label: 'Free Color Palettes', url: 'https://templatemind.com/tools/color-palettes' },
+    { label: 'Advanced Color Palettes', url: 'https://flatpalette.com/' },
+    { label: 'Free UI Resources', url: 'https://templatemind.com/' },
+    { label: 'CSS Font Stacks', url: 'https://templatemind.com/tools/css-fonts' },
+    { label: 'Favicon Studio', url: 'https://faviconexpert.com/' },
   ];
 
   return (
@@ -156,6 +165,26 @@ export default function Navbar({
                         </button>
                       );
                     })}
+
+                    <div className="px-3 py-1.5 border-t border-b border-slate-100 dark:border-slate-800/60 my-1.5 bg-slate-50/50 dark:bg-slate-900/30">
+                      <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 block">
+                        Design Companions
+                      </span>
+                    </div>
+                    <div className="space-y-0.5 px-1 pb-1">
+                      {designPartners.map((partner, pIdx) => (
+                        <a
+                          key={pIdx}
+                          href={partner.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-between rounded-lg px-2.5 py-1.5 text-[10px] font-extrabold uppercase tracking-wider text-slate-650 dark:text-slate-350 hover:bg-slate-50 dark:hover:bg-slate-900 hover:text-indigo-650 dark:hover:text-indigo-400 transition-colors font-display"
+                        >
+                          <span>{partner.label}</span>
+                          <ExternalLink className="h-3 w-3 opacity-60 text-indigo-500" />
+                        </a>
+                      ))}
+                    </div>
                   </div>
                 </>
               )}
@@ -266,6 +295,28 @@ export default function Navbar({
                 </button>
               );
             })}
+
+            {/* Mobile Design Companions divider & links */}
+            <div className="px-4 py-2 mt-2 border-t border-slate-150 dark:border-slate-800/60 font-display">
+              <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 block">
+                Design Companions
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 gap-1.5 px-2">
+              {designPartners.map((partner, pIdx) => (
+                <a
+                  key={pIdx}
+                  href={partner.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-950 hover:bg-slate-100 dark:hover:bg-slate-850 font-display transition-all"
+                >
+                  <span>{partner.label}</span>
+                  <ExternalLink className="h-4 w-4 text-indigo-500" />
+                </a>
+              ))}
+            </div>
 
             {/* Dedicated mobile layout admin login item */}
             <div className="pt-2 border-t border-slate-150 dark:border-slate-800/60 mt-2">

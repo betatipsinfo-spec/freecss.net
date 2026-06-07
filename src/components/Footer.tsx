@@ -124,6 +124,8 @@ export default function Footer({
             <div className="text-slate-400 dark:text-slate-650 text-[11px] mt-1 font-mono">
               (Live CSS Typography Customizer)
             </div>
+            
+
           </div>
 
         </div>
@@ -132,11 +134,14 @@ export default function Footer({
           <p>
             &copy; {currentYear} <span className="font-semibold text-slate-700 dark:text-slate-350">{footerCopyrightName}</span>. All rights reserved.
           </p>
-          <div className="flex space-x-6 mt-4 sm:mt-0 font-medium">
-            <a href="#styler" onClick={(e) => { e.preventDefault(); setActiveTab('styler'); }} className="hover:text-slate-850 dark:hover:text-slate-300 transition-colors">Styler</a>
-            <a href="#directory" onClick={(e) => { e.preventDefault(); setActiveTab('directory'); }} className="hover:text-slate-850 dark:hover:text-slate-300 transition-colors">Web-Safe Catalog</a>
-            <a href="#compatibility" onClick={(e) => { e.preventDefault(); setActiveTab('compatibility'); }} className="hover:text-slate-850 dark:hover:text-slate-300 transition-colors">OS Scores</a>
-            <a href="#cheatsheet" onClick={(e) => { e.preventDefault(); setActiveTab('cheatsheet'); }} className="hover:text-slate-850 dark:hover:text-slate-300 transition-colors">Cheat Sheet</a>
+          <div className="flex flex-wrap gap-x-5 gap-y-2 mt-4 sm:mt-0 font-medium justify-center sm:justify-end">
+            <a href="#styler" onClick={(e) => { e.preventDefault(); setActiveTab('styler'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:text-slate-850 dark:hover:text-slate-300 transition-colors">Styler</a>
+            <a href="#directory" onClick={(e) => { e.preventDefault(); setActiveTab('directory'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:text-slate-850 dark:hover:text-slate-300 transition-colors">Catalog</a>
+            <a href="#compatibility" onClick={(e) => { e.preventDefault(); setActiveTab('compatibility'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:text-slate-850 dark:hover:text-slate-300 transition-colors">OS Scores</a>
+            <a href="#cheatsheet" onClick={(e) => { e.preventDefault(); setActiveTab('cheatsheet'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="hover:text-slate-850 dark:hover:text-slate-300 transition-colors">Cheat Sheet</a>
+            <a href="#about" onClick={(e) => { e.preventDefault(); setActiveTab('about'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline transition-colors">About</a>
+            <a href="#privacy" onClick={(e) => { e.preventDefault(); setActiveTab('privacy'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline transition-colors">Privacy</a>
+            <a href="#terms" onClick={(e) => { e.preventDefault(); setActiveTab('terms'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline transition-colors">Terms</a>
           </div>
         </div>
       </div>
