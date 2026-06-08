@@ -209,9 +209,9 @@ export default function AdminDashboard({
     if (window.confirm('Reset all configurations to factory defaults?')) {
       const defaults: AppAdminConfig = {
         defaultFontSize: 48,
-        brandName: 'CSSFONTS',
+        brandName: 'FREECSS',
         brandLogoSymbol: '✨',
-        brandLogoUrl: '',
+        brandLogoUrl: 'https://freecss.net/favicon-32x32.png',
         primaryBrandColor: '#6366f1', // indigo-500
         secondaryBrandColor: '#4f46e5', // indigo-600
         defaultPreviewTheme: 'dark',

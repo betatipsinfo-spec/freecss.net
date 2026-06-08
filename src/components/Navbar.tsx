@@ -19,9 +19,9 @@ export default function Navbar({
   darkMode, 
   setDarkMode, 
   favoritesCount = 0,
-  brandName = 'CSSFONTS',
+  brandName = 'FREECSS',
   brandLogoSymbol = '✨',
-  brandLogoUrl = ''}: NavbarProps) {
+  brandLogoUrl = 'https://freecss.net/favicon-32x32.png'}: NavbarProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
   const [toolsDropdownOpen, setToolsDropdownOpen] = React.useState(false);
 

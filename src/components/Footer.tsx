@@ -15,9 +15,9 @@ interface FooterProps {
 
 export default function Footer({ 
   setActiveTab,
-  brandName = 'CSSFONTS',
+  brandName = 'FREECSS',
   brandLogoSymbol = '✨',
-  brandLogoUrl = '',
+  brandLogoUrl = 'https://freecss.net/favicon-32x32.png',
   footerCopyrightName = 'cssfonts.net',
   footerDescription = 'Interactive design suite for web typography. Preview standard and Google fonts, generate copy-to-clipboard clean CSS code, compare rendering side-by-side, and inspect universal web safety index scores.',
   footerAboutTitle = 'About CSSFonts',

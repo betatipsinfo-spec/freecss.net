@@ -50,9 +50,9 @@ export default function App() {
   const [adminConfig, setAdminConfig] = useState<AppAdminConfig>(() => {
     const defaultConfig: AppAdminConfig = {
       defaultFontSize: 48,
-      brandName: 'CSSFONTS',
+      brandName: 'FREECSS',
       brandLogoSymbol: '✨',
-      brandLogoUrl: '',
+      brandLogoUrl: 'https://freecss.net/favicon-32x32.png',
       primaryBrandColor: '#6366f1', // indigo-500
       secondaryBrandColor: '#4f46e5', // indigo-600
       defaultPreviewTheme: 'dark',
@@ -77,10 +77,17 @@ export default function App() {
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          return {
+          const loaded = {
             ...defaultConfig,
             ...parsed
           };
+          if (loaded.brandName === 'CSSFONTS' || loaded.brandName === 'FreeCSS') {
+            loaded.brandName = 'FREECSS';
+          }
+          if (loaded.brandLogoUrl === '' || loaded.brandLogoUrl === 'https://freecss.net/logo.png') {
+            loaded.brandLogoUrl = 'https://freecss.net/favicon-32x32.png';
+          }
+          return loaded;
         } catch (e) {
           // fallback to defaults
         }
