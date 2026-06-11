@@ -53,12 +53,13 @@ export default function Navbar({
           
           {/* Logo Brand */}
           <div className="flex items-center space-x-2.5 cursor-pointer" onClick={() => setActiveTab('styler')}>
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-950 border-2 border-slate-900 dark:border-white shadow-sm overflow-hidden">
-              {brandLogoUrl ? (
-                <img src={brandLogoUrl} alt="Logo" className="h-full w-full object-cover" referrerPolicy="no-referrer" />
-              ) : (
-                <span className="text-base font-bold font-display">{brandLogoSymbol}</span>
-              )}
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-600 via-violet-600 to-pink-550 text-white border-2 border-indigo-600/30 shadow-sm overflow-hidden relative group">
+              <span className="text-[12px] font-black tracking-tighter leading-none text-white font-mono z-10 transition-transform group-hover:scale-110 duration-200">
+                CSS
+              </span>
+              <div className="absolute -bottom-1 -right-1 text-lg opacity-25 font-mono font-bold leading-none select-none text-white">
+                #
+              </div>
             </div>
             <div className="flex items-center">
               <span className="text-2xl font-black tracking-tighter text-slate-900 dark:text-white font-display uppercase">

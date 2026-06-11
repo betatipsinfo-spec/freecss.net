@@ -33,12 +33,13 @@ export default function Footer({
           {/* Brand Info */}
           <div className="col-span-1 md:col-span-1">
             <div className="flex items-center space-x-2.5 mb-4">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-950 border border-slate-900 dark:border-white shadow-sm overflow-hidden">
-                {brandLogoUrl ? (
-                  <img src={brandLogoUrl} alt="Logo" className="h-full w-full object-cover" referrerPolicy="no-referrer" />
-                ) : (
-                  <span className="text-xs font-bold font-display">{brandLogoSymbol}</span>
-                )}
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-indigo-600 via-violet-600 to-pink-550 text-white border border-indigo-600/30 shadow-sm overflow-hidden relative group">
+                <span className="text-[10px] font-black tracking-tighter leading-none text-white font-mono z-10 transition-transform group-hover:scale-110 duration-200">
+                  CSS
+                </span>
+                <div className="absolute -bottom-0.5 -right-0.5 text-xs opacity-25 font-mono font-bold leading-none select-none text-white">
+                  #
+                </div>
               </div>
               <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white font-display uppercase">
                 {brandName}
