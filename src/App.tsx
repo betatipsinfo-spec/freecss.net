@@ -13,6 +13,19 @@ import FAQ from './components/FAQ';
 import AboutView from './components/AboutView';
 import PrivacyView from './components/PrivacyView';
 import TermsView from './components/TermsView';
+import HoverEffectsGenerator from './components/HoverEffectsGenerator';
+import BoxShadowGenerator from './components/BoxShadowGenerator';
+import LiquidGlassGenerator from './components/LiquidGlassGenerator';
+import ClipPathGenerator from './components/ClipPathGenerator';
+import NeumorphismGenerator from './components/NeumorphismGenerator';
+import BackdropFilterGenerator from './components/BackdropFilterGenerator';
+import BorderRadiusGenerator from './components/BorderRadiusGenerator';
+import TooltipGenerator from './components/TooltipGenerator';
+import CustomCursorGenerator from './components/CustomCursorGenerator';
+import BackgroundPatternGenerator from './components/BackgroundPatternGenerator';
+import TransformPlayground from './components/TransformPlayground';
+import RelatedEffects from './components/RelatedEffects';
+import BackToTop from './components/BackToTop';
 import { ActiveTab, AppAdminConfig } from './types';
 import { Type, Sparkles, Wand2, ArrowRight } from 'lucide-react';
 
@@ -226,9 +239,12 @@ export default function App() {
   // Handle direct tab navigation with specific target font
   const navigateToStylerWithFont = (fontId: string) => {
     setSelectedFontId(fontId);
-    setActiveTab('styler');
-    // Scroll smoothly to top when switching
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    handleSetActiveTab('styler');
+  };
+
+  const handleSetActiveTab = (tab: ActiveTab) => {
+    setActiveTab(tab);
+    window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
   return (
@@ -237,7 +253,7 @@ export default function App() {
       {/* 1. Universal Top Navigation Header */}
       <Navbar
         activeTab={activeTab}
-        setActiveTab={setActiveTab}
+        setActiveTab={handleSetActiveTab}
         darkMode={darkMode}
         setDarkMode={setDarkMode}
         favoritesCount={favorites.length}
@@ -296,6 +312,50 @@ export default function App() {
             <FontComparison />
           )}
 
+          {activeTab === 'effects' && (
+            <HoverEffectsGenerator />
+          )}
+
+          {activeTab === 'shadow' && (
+            <BoxShadowGenerator />
+          )}
+
+          {activeTab === 'glass' && (
+            <LiquidGlassGenerator />
+          )}
+
+          {activeTab === 'clippath' && (
+            <ClipPathGenerator />
+          )}
+
+          {activeTab === 'neumorphism' && (
+            <NeumorphismGenerator />
+          )}
+
+          {activeTab === 'backdrop-filter' && (
+            <BackdropFilterGenerator />
+          )}
+
+          {activeTab === 'border-radius' && (
+            <BorderRadiusGenerator />
+          )}
+
+          {activeTab === 'tooltip' && (
+            <TooltipGenerator />
+          )}
+
+          {activeTab === 'cursor' && (
+            <CustomCursorGenerator />
+          )}
+
+          {activeTab === 'background-pattern' && (
+            <BackgroundPatternGenerator />
+          )}
+
+          {activeTab === 'transform-playground' && (
+            <TransformPlayground />
+          )}
+
           {activeTab === 'compatibility' && (
             <CompatibilityTable />
           )}
@@ -334,14 +394,15 @@ export default function App() {
           )}
         </section>
 
+        <RelatedEffects activeTab={activeTab} setActiveTab={handleSetActiveTab} />
+        <FAQ activeTab={activeTab} />
         <CompanionTools />
-        <FAQ />
 
       </main>
 
       {/* 4. Beautiful Footer Wrapper */}
       <Footer 
-        setActiveTab={setActiveTab} 
+        setActiveTab={handleSetActiveTab} 
         brandName={adminConfig.brandName}
         brandLogoSymbol={adminConfig.brandLogoSymbol}
         brandLogoUrl={adminConfig.brandLogoUrl}
@@ -350,6 +411,9 @@ export default function App() {
         footerAboutTitle={adminConfig.footerAboutTitle}
         footerAboutDescription={adminConfig.footerAboutDescription}
       />
+
+      {/* Floating Back to Top Control */}
+      <BackToTop />
 
     </div>
   );

@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { Search, Grid, Eye, Copy, Check, Filter, Compass, SlidersHorizontal, Sliders, Heart } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search, Grid, Eye, Copy, Check, Filter, Compass, SlidersHorizontal, Sliders, Heart, ArrowDown } from 'lucide-react';
 import { ALL_FONTS, SAMPLE_TEXTS } from '../data/fontsData';
 import { FontItem } from '../types';
+import { motion } from 'motion/react';
 
 interface FontGridProps {
   onSelectFont: (fontId: string) => void;
@@ -14,6 +15,14 @@ export default function FontGrid({ onSelectFont, favorites = [], toggleFavorite 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [fontSource, setFontSource] = useState<'all' | 'system' | 'google'>('all');
+  
+  // Pagination State
+  const [visibleCount, setVisibleCount] = useState(30);
+
+  // Reset visibleCount limit whenever filter options change
+  useEffect(() => {
+    setVisibleCount(30);
+  }, [searchQuery, selectedCategory, fontSource]);
   
   // Preview configuration
   const [globalPreviewText, setGlobalPreviewText] = useState('Typing live preview stylesheet.');
@@ -34,6 +43,8 @@ export default function FontGrid({ onSelectFont, favorites = [], toggleFavorite 
 
     return matchesSearch && matchesCategory && matchesSource;
   });
+
+  const displayedFonts = filteredFonts.slice(0, visibleCount);
 
   const categories = [
     { value: 'all', label: 'All Categories' },
@@ -152,7 +163,7 @@ export default function FontGrid({ onSelectFont, favorites = [], toggleFavorite 
 
       {/* 2. Responsive Font Grid Catalog */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {filteredFonts.map((font) => {
+        {displayedFonts.map((font) => {
           const isCopied = copiedFontId === font.id;
           const isFavorited = favorites.includes(font.id);
           return (
@@ -264,6 +275,25 @@ export default function FontGrid({ onSelectFont, favorites = [], toggleFavorite 
           );
         })}
       </div>
+
+      {/* Interactive Load More Button for Pagination */}
+      {filteredFonts.length > visibleCount && (
+        <div id="dir-load-more" className="flex flex-col items-center justify-center pt-8 pb-4 font-display">
+          <p className="text-xs font-mono font-bold text-slate-400 dark:text-slate-500 mb-4 uppercase tracking-wider">
+            Showing <span className="text-slate-800 dark:text-slate-200">{visibleCount}</span> of <span className="text-slate-800 dark:text-slate-200">{filteredFonts.length}</span> Web Fonts
+          </p>
+          <motion.button
+            id="load-more-btn"
+            whileHover={{ scale: 1.02, y: -1 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => setVisibleCount((prev) => Math.min(prev + 30, filteredFonts.length))}
+            className="flex items-center gap-2 px-8 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-indigo-650/15 cursor-pointer transition-all border border-indigo-500/10"
+          >
+            <ArrowDown className="h-4 w-4 animate-bounce" />
+            <span>Load More Fonts</span>
+          </motion.button>
+        </div>
+      )}
 
       {/* No Results Fallback state */}
       {filteredFonts.length === 0 && (

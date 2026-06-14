@@ -426,17 +426,45 @@ export default function FontStyler({
       {/* 1. Control Panel (Left column - xl:span-4 lg:span-5) */}
       <div id="styler-controls" className="lg:col-span-4 bg-white dark:bg-slate-900 border-2 border-slate-250 dark:border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col gap-6 justify-between transition-all">
         <div>
-          <div className="flex items-center justify-between mb-4 pb-4 border-b-2 border-slate-100 dark:border-slate-800/80">
-            <h2 className="text-sm font-extrabold tracking-wider text-slate-900 dark:text-white uppercase font-display flex items-center gap-2">
+          <div className="flex items-center justify-between mb-4 pb-4 border-b-2 border-slate-100 dark:border-slate-800/80 font-display">
+            <h2 className="text-sm font-extrabold tracking-wider text-slate-900 dark:text-white uppercase flex items-center gap-2">
               <Sliders className="h-4.5 w-4.5 text-indigo-500" /> Font Customizer
             </h2>
-            <button
-              onClick={handleReset}
-              className="text-xs text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1 cursor-pointer font-bold uppercase tracking-wider font-display"
-              title="Reset to default styles"
-            >
-              <RefreshCw className="h-3 w-3" /> Reset
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  const el = document.getElementById('faq-section');
+                  if (el) {
+                    el.scrollIntoView({ behavior: 'smooth' });
+                  }
+                  const input = document.getElementById('faq-search-input') as HTMLInputElement;
+                  if (input) {
+                    setTimeout(() => {
+                      input.focus();
+                      const container = document.getElementById('faq-search-container');
+                      if (container) {
+                        container.classList.add('ring-4', 'ring-indigo-500/35', 'dark:ring-indigo-500/20');
+                        setTimeout(() => {
+                          container.classList.remove('ring-4', 'ring-indigo-500/35', 'dark:ring-indigo-500/20');
+                        }, 1500);
+                      }
+                    }, 650);
+                  }
+                }}
+                className="text-xs text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1 cursor-pointer font-bold uppercase tracking-wider transition-colors"
+                title="Scroll and focus typography FAQs"
+              >
+                <Info className="h-3 w-3" /> FAQ
+              </button>
+              <span className="text-slate-200 dark:text-slate-800">|</span>
+              <button
+                onClick={handleReset}
+                className="text-xs text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1 cursor-pointer font-bold uppercase tracking-wider transition-colors"
+                title="Reset to default styles"
+              >
+                <RefreshCw className="h-3 w-3" /> Reset
+              </button>
+            </div>
           </div>
 
           <div className="space-y-5 animate-fade-in">
