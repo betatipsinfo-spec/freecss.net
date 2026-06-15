@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { 
   Sparkles, RotateCcw, Sliders, Layers, Code, Palette, HelpCircle, 
-  Copy, Check, Image, Grid, Eye, CheckCircle, Compass, Maximize
+  Copy, Check, Image, Grid, Eye, CheckCircle, Compass, Maximize,
+  BadgeInfo, Box
 } from 'lucide-react';
 
 interface RadiusPreset {
@@ -101,9 +102,8 @@ export default function BorderRadiusGenerator() {
   const [showValuesOverlay, setShowValuesOverlay] = useState<boolean>(true);
 
   // Exporters statuses
-  const [copiedCSS, setCopiedCSS] = useState<boolean>(false);
-  const [copiedTailwind, setCopiedTailwind] = useState<boolean>(false);
-  const [copiedReact, setCopiedReact] = useState<boolean>(false);
+  const [activeCodeTab, setActiveCodeTab] = useState<'css' | 'tailwind' | 'react'>('css');
+  const [copiedText, setCopiedText] = useState<string | null>(null);
 
   // Assemble full 8-point string
   // tl-h tr-h br-h bl-h / tl-v tr-v br-v bl-v
@@ -166,52 +166,39 @@ border-radius: ${currentRadiusString};
 
   const copyToClipboard = (text: string, format: 'css' | 'tailwind' | 'react') => {
     navigator.clipboard.writeText(text);
-    if (format === 'css') {
-      setCopiedCSS(true);
-      setTimeout(() => setCopiedCSS(false), 2000);
-    } else if (format === 'tailwind') {
-      setCopiedTailwind(true);
-      setTimeout(() => setCopiedTailwind(false), 2000);
-    } else {
-      setCopiedReact(true);
-      setTimeout(() => setCopiedReact(false), 2000);
-    }
+    setCopiedText(format);
+    setTimeout(() => setCopiedText(null), 2000);
   };
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto px-4 py-6 sm:py-10 animate-fade-in" id="border-radius-workspace">
+    <div className="animate-fade-in relative space-y-8" id="border-radius-workspace">
       
-      {/* HEADER UNIT */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-150 dark:border-slate-800 pb-6 animate-fade-in">
-        <div>
-          <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-display font-black text-xs uppercase tracking-widest mb-1.5 animate-pulse">
-            <Sparkles className="h-4 w-4" /> 8-point shape morpher
-          </div>
-          <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white uppercase font-display sm:text-4xl">
-            Border Radius CSS Playground
-          </h1>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 font-display font-medium uppercase tracking-wider">
-            Exquisite interactive customizer simulating fluid shapes, sleek organic blobs, and asymmetrical card corners
-          </p>
-        </div>
-
-        <button
-          onClick={handleReset}
-          className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-black uppercase tracking-wider font-display rounded-xl border border-slate-205 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-650 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 cursor-pointer self-start md:self-center transition-all shadow-2xs"
-        >
-          <RotateCcw className="h-3.5 w-3.5" /> Reset Playground
-        </button>
-      </div>
+     
 
       {/* QUICK PRESETS CAROUSEL */}
       <div className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-xs font-black uppercase tracking-wider text-slate-450 dark:text-slate-500 flex items-center gap-2 font-display">
-            <Palette className="h-4 w-4 text-indigo-500" /> Organic Curvature Presets
-          </h3>
-          <span className="text-[9px] font-mono bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 font-extrabold uppercase px-2 py-0.5 rounded-full">
-            Fluid blob layout templates
-          </span>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-1">
+          <div className="flex items-center gap-2.5">
+            <Palette className="h-4.5 w-4.5 text-indigo-500" />
+            <div>
+              <h3 className="text-xs font-black uppercase tracking-wider text-slate-850 dark:text-slate-200 font-display">
+                Organic Curvature Presets
+              </h3>
+              <p className="text-[10px] text-slate-450 dark:text-slate-500 leading-relaxed">
+                Click a preset below to instantly seed coordinates and organic structures
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleReset}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-rose-200 hover:border-rose-300 dark:border-rose-950/45 bg-rose-50/50 hover:bg-rose-100/50 dark:bg-rose-950/20 text-rose-650 dark:text-rose-450 text-[10.5px] font-black uppercase tracking-wider font-display transition-all cursor-pointer shrink-0"
+            >
+              <RotateCcw className="h-3 w-3" />
+              Reset Shape
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-3">
@@ -508,7 +495,7 @@ border-radius: ${currentRadiusString};
         </div>
 
         {/* PREVIEW STAGE (5 Cols) */}
-        <div className="lg:col-span-5 space-y-6">
+        <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-24">
 
           {/* DYNAMIC SHAPE PREVIEW CANVAS */}
           <div className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm flex flex-col justify-between overflow-hidden relative">
@@ -623,126 +610,84 @@ border-radius: ${currentRadiusString};
 
       </div>
 
-      {/* FULL-WIDTH REAL TIME EXPORT PANEL */}
-      <div className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs space-y-6 font-display animate-fade-in">
+      {/* CODE COMPILER EXPORT COMPONENT - 12 Column full-width section below grid, above Explore Other Generators */}
+      <div className="bg-white dark:bg-slate-950 border-2 border-slate-150 dark:border-slate-850 rounded-3xl p-6 shadow-sm">
         
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-150 dark:border-slate-800 pb-4">
-          <div>
-            <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-2 font-display">
-              <Code className="h-5 w-5 text-indigo-500" /> Real-time Export Panel
+        <div className="flex items-center justify-between mb-4 border-b border-slate-100 dark:border-slate-850 pb-3">
+          <div className="flex items-center gap-2">
+            <Box className="h-4.5 w-4.5 text-indigo-500" />
+            <h3 className="text-md font-black uppercase tracking-wider font-display text-slate-800 dark:text-white">
+              Export Border-Radius Styles
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
-              Copy generated border-radius parameters instantly in your preferred structures
-            </p>
           </div>
-          <span className="self-start sm:self-center text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-55/60 dark:bg-emerald-950/40 border border-emerald-200/50 dark:border-emerald-990/55 px-3 py-1 rounded-xl uppercase tracking-wider animate-pulse flex items-center gap-1">
-            <Sparkles className="h-3 w-3" /> Live Synced
-          </span>
+
+          <div className="flex rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-150 dark:border-slate-850 p-1">
+            {(['css', 'tailwind', 'react'] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveCodeTab(tab)}
+                className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider font-display rounded-lg transition-all cursor-pointer ${
+                  activeCodeTab === tab
+                    ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-755'
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Compiled code block */}
+        <div className="relative rounded-2xl bg-slate-950 p-5 mt-4 min-h-[140px] border border-slate-850 overflow-x-auto">
           
-          {/* RAW CSS BOX */}
-          <div className="space-y-3 flex flex-col justify-between h-full bg-slate-50/50 dark:bg-slate-950/30 p-4.5 rounded-xl border border-slate-150 dark:border-slate-850">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-wider text-slate-650 dark:text-slate-350">
-                <span>1. Standard CSS3 Declarations</span>
-                <button
-                  onClick={() => copyToClipboard(cssCode, 'css')}
-                  className="px-2.5 py-1 rounded-lg text-[10px] font-bold text-indigo-650 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 hover:bg-indigo-105 duration-150 flex items-center gap-1 cursor-pointer font-display"
-                >
-                  {copiedCSS ? (
-                    <>
-                      <Check className="h-3 w-3 text-emerald-500" /> COPIED!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3 w-3" /> COPY CSS
-                    </>
-                  )}
-                </button>
-              </div>
+          {/* Copy keyboard */}
+          <button
+            onClick={() => {
+              const targetCode = activeCodeTab === 'css' 
+                ? cssCode 
+                : activeCodeTab === 'tailwind' 
+                ? getTailwindCode() 
+                : reactCode;
+              copyToClipboard(targetCode, activeCodeTab);
+            }}
+            className="absolute top-4 right-4 p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 hover:border-slate-700 text-slate-355 cursor-pointer transition-all z-10 flex items-center gap-1.5"
+          >
+            {copiedText === activeCodeTab ? (
+              <>
+                <Check className="h-4.5 w-4.5 text-emerald-500" />
+                <span className="text-[10px] font-black uppercase text-emerald-500 font-display">Copied!</span>
+              </>
+            ) : (
+              <>
+                <Copy className="h-4.5 w-4.5 text-indigo-400" />
+                <span className="text-[10px] font-black uppercase font-display text-slate-300">Copy Code</span>
+              </>
+            )}
+          </button>
 
-              <div className="p-3.5 bg-slate-950 rounded-xl border border-slate-850 font-mono text-[11px] leading-relaxed text-indigo-400 overflow-x-auto select-all whitespace-pre h-[140px] flex items-start justify-start">
-                <code className="w-full text-left block">{cssCode}</code>
-              </div>
-            </div>
-          </div>
-
-          {/* TAILWIND CSS BOX */}
-          <div className="space-y-3 flex flex-col justify-between h-full bg-slate-50/50 dark:bg-slate-950/30 p-4.5 rounded-xl border border-slate-150 dark:border-slate-850">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-wider text-slate-650 dark:text-slate-350">
-                <span>2. Tailwind CSS Arbitrary Class</span>
-                <button
-                  onClick={() => copyToClipboard(getTailwindCode(), 'tailwind')}
-                  className="px-2.5 py-1 rounded-lg text-[10px] font-bold text-indigo-650 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 hover:bg-indigo-105 duration-150 flex items-center gap-1 cursor-pointer font-display"
-                >
-                  {copiedTailwind ? (
-                    <>
-                      <Check className="h-3 w-3 text-emerald-500" /> COPIED!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3 w-3" /> COPY CLASS
-                    </>
-                  )}
-                </button>
-              </div>
-
-              <div className="p-3.5 bg-slate-950 rounded-xl border border-slate-850 font-mono text-[11px] leading-relaxed text-purple-200 overflow-x-auto select-all whitespace-pre h-[140px] flex items-start justify-start">
-                <code className="w-full text-left block">{getTailwindCode()}</code>
-              </div>
-            </div>
-          </div>
-
-          {/* REACT CONST DECLARATION BOX */}
-          <div className="space-y-3 flex flex-col justify-between h-full bg-slate-50/50 dark:bg-slate-950/30 p-4.5 rounded-xl border border-slate-150 dark:border-slate-850">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-wider text-slate-655 dark:text-slate-350">
-                <span>3. React Inline Style Declaration</span>
-                <button
-                  onClick={() => copyToClipboard(reactCode, 'react')}
-                  className="px-2.5 py-1 rounded-lg text-[10px] font-bold text-indigo-655 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 hover:bg-indigo-105 duration-150 flex items-center gap-1 cursor-pointer font-display"
-                >
-                  {copiedReact ? (
-                    <>
-                      <Check className="h-3 w-3 text-emerald-550" /> COPIED!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3 w-3" /> COPY INLINE JS
-                    </>
-                  )}
-                </button>
-              </div>
-
-              <div className="p-3.5 bg-slate-950 rounded-xl border border-slate-850 font-mono text-[11px] leading-relaxed text-blue-200 overflow-x-auto select-all whitespace-pre h-[140px] flex items-start justify-start">
-                <code className="w-full text-left block">{reactCode}</code>
-              </div>
-            </div>
-          </div>
+          {/* Print Code segment */}
+          <pre className="text-xs font-mono font-bold text-slate-350 text-left whitespace-pre select-all pt-4 leading-normal">
+            {activeCodeTab === 'css' && cssCode}
+            {activeCodeTab === 'tailwind' && getTailwindCode()}
+            {activeCodeTab === 'react' && reactCode}
+          </pre>
 
         </div>
-
-      </div>
-
-      {/* COMPACT INTUITIVE DESCRIPTION SECTION */}
-      <div className="bg-slate-50 dark:bg-slate-955 rounded-2xl border-2 border-slate-205 dark:border-slate-850 p-6 flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="flex items-center gap-5 text-left">
-          <div className="bg-indigo-50 dark:bg-indigo-950 p-3 rounded-xl border border-indigo-200 dark:border-indigo-900">
-            <Maximize className="h-6 w-6 text-indigo-600 dark:text-indigo-450" />
-          </div>
+        
+        {/* Informational helpful tips */}
+        <div className="mt-4 p-4 rounded-2xl bg-indigo-50/50 dark:bg-slate-900/40 border border-indigo-100/50 dark:border-slate-850 text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed flex gap-3">
+          <BadgeInfo className="h-5 w-5 text-indigo-500 shrink-0 mt-0.5" />
           <div>
-            <h4 className="text-xs uppercase font-black tracking-wider text-slate-850 dark:text-white">
-              Understanding 8-value border-radius Mechanics
-            </h4>
-            <p className="text-[11px] leading-relaxed text-slate-550 dark:text-slate-400 max-w-2xl">
-              By adding a slash (<span className="font-mono text-indigo-600 dark:text-indigo-400 font-bold">/</span>), we isolate horizontal radius offsets from vertical radius offsets. The values before the slash dictate the horizontal point limits for all four corners (Top-Left, Top-Right, Bottom-Right, Bottom-Left), while the values following the slash control the corresponding vertical curves. This creates custom elastic vectors instead of simple circles.
+            <p className="font-bold text-slate-850 dark:text-slate-300 mb-0.5">Performance & Animation tip</p>
+            <p>
+              Applying 8-point <code>border-radius</code> parameters relies fully on high-performance browser hardware compositing. This renders sharp vector boundaries instantly with zero CPU overhead compared to heavy SVG path elements. Declare standard transition speeds on your shapes (e.g. <code>transition: border-radius 0.3s ease</code>) to smoothly morph shapes dynamically!
             </p>
           </div>
         </div>
+
       </div>
+
 
     </div>
   );

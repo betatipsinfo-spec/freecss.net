@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Sparkles, RotateCcw, Sliders, Code, Palette, HelpCircle, 
-  Copy, Check, Eye, ArrowRight, MousePointer, Monitor, Info, Play, Trash2
+  Copy, Check, Eye, ArrowRight, MousePointer, Monitor, Info, Play, Trash2, Box
 } from 'lucide-react';
 
 interface CursorPreset {
@@ -248,7 +248,7 @@ export default function CustomCursorGenerator() {
   // Interactive Viewport UI State
   const [isSiteWideActive, setIsSiteWideActive] = useState<boolean>(false);
   const [copiedText, setCopiedText] = useState<string>('');
-  const [activeCodeTab, setActiveCodeTab] = useState<'html-css' | 'react' | 'js'>('html-css');
+  const [activeCodeTab, setActiveCodeTab] = useState<'html-css' | 'react' | 'react-tailwind'>('html-css');
   const [isHovered, setIsHovered] = useState<boolean>(false);
   const [isClicked, setIsClicked] = useState<boolean>(false);
   const [hoverType, setHoverType] = useState<string>('');
@@ -580,67 +580,103 @@ a, button, .interactive {
 }`;
   };
 
-  const getJsCode = () => {
-    return `// === DYNAMIC SMOOTH LAGGING INJECTOR ===
-const dot = document.createElement('div');
-const ring = document.createElement('div');
+  const getReactTailwindCode = () => {
+    return `import React, { useEffect, useState, useRef } from 'react';
 
-dot.className = 'custom-cursor-dot';
-ring.className = 'custom-cursor-ring';
-
-document.body.appendChild(dot);
-document.body.appendChild(ring);
-
-let mouseX = -100;
-let mouseY = -100;
-let ringX = -100;
-let ringY = -100;
-
-// Track Mouse Movement
-window.addEventListener('mousemove', (e) => {
-  mouseX = e.clientX;
-  mouseY = e.clientY;
+export default function CustomCursorTailwind() {
+  const [coords, setCoords] = useState({ x: -100, y: -100 });
+  const [isHovering, setIsHovering] = useState(false);
+  const [isClicked, setIsClicked] = useState(false);
   
-  // Update Dot Immediately
-  dot.style.left = \`\${mouseX}px\`;
-  dot.style.top = \`\${mouseY}px\`;
-});
+  const ringRef = useRef({ x: -100, y: -100 });
+  const [ringRender, setRingRender] = useState({ x: -100, y: -100 });
 
-// Linear Interpolation (Physics Lag Engine)
-const speed = ${lagSpeed}; // Lerp speed controller 
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setCoords({ x: e.clientX, y: e.clientY });
+    };
 
-function animate() {
-  const distX = mouseX - ringX;
-  const distY = mouseY - ringY;
-  
-  ringX += distX * speed;
-  ringY += distY * speed;
-  
-  ring.style.left = \`\${ringX}px\`;
-  ring.style.top = \`\${ringY}px\`;
-  
-  requestAnimationFrame(animate);
-}
-animate();
+    const handleMouseDown = () => setIsClicked(true);
+    const handleMouseUp = () => setIsClicked(false);
+    
+    const handleMouseOver = (e) => {
+      if (e.target.closest('a, button, [role="button"]')) {
+        setIsHovering(true);
+      } else {
+        setIsHovering(false);
+      }
+    };
 
-// Hover interactions
-const interactives = document.querySelectorAll('a, button, [role="button"]');
-interactives.forEach(element => {
-  element.addEventListener('mouseenter', () => {
-    ring.style.transform = 'translate(-50%, -50%) scale(${hoverScale})';
-  });
-  element.addEventListener('mouseleave', () => {
-    ring.style.transform = 'translate(-50%, -50%) scale(1)';
-  });
-});
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('mouseover', handleMouseOver);
 
-// Click Interaction
-window.addEventListener('mousedown', () => {
-  ring.style.transform = 'translate(-50%, -50%) scale(${clickScale})';
-});
-window.addEventListener('mouseup', () => {
-  ring.style.transform = isHovered ? 'translate(-50%, -50%) scale(${hoverScale})' : 'translate(-50%, -50%) scale(1)';
-});`;
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('mouseover', handleMouseOver);
+    };
+  }, []);
+
+  // LERP physics loop
+  useEffect(() => {
+    let frameId;
+    const tick = () => {
+      const targetSpeed = ${lagSpeed};
+      ringRef.current.x += (coords.x - ringRef.current.x) * targetSpeed;
+      ringRef.current.y += (coords.y - ringRef.current.y) * targetSpeed;
+      
+      setRingRender({ x: ringRef.current.x, y: ringRef.current.y });
+      frameId = requestAnimationFrame(tick);
+    };
+    frameId = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frameId);
+  }, [coords]);
+
+  const scale = (isHovering ? ${hoverScale} : 1) * (isClicked ? ${clickScale} : 1);
+
+  return (
+    <>
+      <style>{\`
+        html, body, a, button { cursor: none !important; }
+      \`}</style>
+      
+      {/* 1. Core Pointer Dot */}
+      <div 
+        className="fixed -translate-x-1/2 -translate-y-1/2 pointer-events-none z-[99999] transition-transform duration-75"
+        style={{
+          left: coords.x,
+          top: coords.y,
+          width: '${dotSize}px',
+          height: '${dotSize}px',
+          backgroundColor: '${dotColor}',
+          borderRadius: '${dotStyle === 'dot' ? '9999px' : '0px'}',
+          display: '${dotStyle === 'none' ? 'none' : 'block'}'
+        }}
+      />
+
+      {/* 2. Lagging Outer Ring */}
+      <div 
+        className="fixed -translate-x-1/2 -translate-y-1/2 pointer-events-none z-[99998] transition-all duration-105 ease-out"
+        style={{
+          left: ringRender.x,
+          top: ringRender.y,
+          width: '${ringSize}px',
+          height: '${ringSize}px',
+          border: '${ringBorderWidth}px solid ${ringColor}',
+          backgroundColor: '${ringStyle === 'blur' ? '${glowColor}' : 'transparent'}',
+          filter: '${ringStyle === 'blur' ? 'blur(8px)' : 'none'}',
+          borderRadius: '${ringStyle === 'square' ? '8px' : '9999px'}',
+          display: '${ringStyle === 'none' ? 'none' : 'block'}',
+          transform: \`translate(-50%, -50%) scale(\${scale})\`,
+          boxShadow: '${glowColor !== 'transparent' ? `0 0 10px ${glowColor}` : 'none'}'
+        }}
+      />
+    </>
+  );
+}`;
   };
 
   const getReactCode = () => {
@@ -750,81 +786,68 @@ export default function CustomCursor() {
 
   return (
     <div className="animate-fade-in relative">
-      {/* Banner / Title Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-8 rounded-3xl bg-linear-to-r from-slate-900 via-indigo-950 to-slate-900 border-2 border-slate-800 text-white shadow-xl relative overflow-hidden mb-8">
-        <div className="absolute top-0 right-0 h-40 w-40 bg-indigo-500/10 blur-3xl rounded-full" />
-        <div className="absolute -bottom-10 left-1/3 h-48 w-48 bg-purple-500/10 blur-3xl rounded-full" />
-
-        <div className="z-10 flex-1">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-black uppercase tracking-widest font-display mb-3">
-            <Sparkles className="h-3 w-3" />
-            CSS Customization Engine
+      
+      {/* Presets and Site-Wide Trial Dashboard Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8 items-stretch">
+        <div className="lg:col-span-9">
+          <h2 className="text-sm font-black uppercase tracking-wider text-slate-450 dark:text-slate-500 mb-3 flex items-center gap-2 font-display">
+            <Palette className="h-4 w-4 text-indigo-500" />
+            Quick-Deploy Custom Cursor Presets
+          </h2>
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+            {CURSOR_PRESETS.map((preset, index) => (
+              <button
+                key={preset.name}
+                onClick={() => loadPreset(index)}
+                className={`group relative text-left p-3.5 rounded-2xl border-2 transition-all cursor-pointer overflow-hidden ${
+                  activePresetIndex === index
+                    ? 'border-indigo-600 bg-linear-to-b from-indigo-50/50 to-indigo-100/30 dark:from-indigo-950/40 dark:to-indigo-900/10 dark:border-indigo-450'
+                    : 'border-slate-150 bg-white hover:border-slate-350 dark:border-slate-850 dark:bg-slate-950 dark:hover:border-slate-700'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs font-bold font-display uppercase tracking-wider text-slate-800 dark:text-slate-200">
+                    {preset.name}
+                  </span>
+                  <span className="text-[9px] font-mono font-bold text-indigo-600 dark:text-indigo-400">
+                    v0.{index + 1}
+                  </span>
+                </div>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                  {preset.description}
+                </p>
+              </button>
+            ))}
           </div>
-          <h1 className="text-3xl md:text-4xl font-black tracking-tight font-display text-white mt-1">
-            CUSTOM <span className="text-indigo-400">CSS CURSOR</span> GENERATOR
-          </h1>
-          <p className="text-slate-400 text-sm mt-2 max-w-2xl leading-relaxed">
-            Create high-performance, dynamic custom cursors with fluid lag interpolation filters, reactive click animations, tail nodes, and clean CSS + React hooks.
-          </p>
         </div>
 
-        {/* Global Toggle Controller Card */}
-        <div className="z-10 bg-slate-900/60 backdrop-blur-md p-4 rounded-2xl border border-slate-800 min-w-[240px] flex flex-col justify-center items-center text-center">
-          <div className="flex items-center gap-2 mb-2">
-            <Monitor className="h-4.5 w-4.5 text-indigo-400" />
-            <span className="text-xs font-bold text-slate-200">Site-Wide Live Trial</span>
-          </div>
-          <p className="text-[10px] text-slate-450 mb-3 max-w-[190px]">
-            Experiment with your custom cursor across the entire browser app!
-          </p>
-          <button
-            onClick={() => setIsSiteWideActive(!isSiteWideActive)}
-            className={`w-full py-2.5 px-4 rounded-xl text-xs font-black uppercase tracking-wider font-display transition-all cursor-pointer ${
-              isSiteWideActive
-                ? 'bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.2)]'
-                : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg border border-indigo-550'
-            }`}
-          >
-            {isSiteWideActive ? '🛑 Remove Cursor' : '🟢 Activate Site-Wide'}
-          </button>
-        </div>
-      </div>
-
-      {/* Preset Pick Grid */}
-      <div className="mb-8">
-        <h2 className="text-sm font-black uppercase tracking-wider text-slate-450 dark:text-slate-500 mb-3 flex items-center gap-2 font-display">
-          <Palette className="h-4 w-4 text-indigo-500" />
-          Quick-Deploy Custom Cursor Presets
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
-          {CURSOR_PRESETS.map((preset, index) => (
+        <div className="lg:col-span-3 flex flex-col justify-end">
+          <div className="bg-white dark:bg-slate-950 border-2 border-slate-150 dark:border-slate-850 p-4.5 rounded-3xl shadow-sm flex flex-col justify-between h-full">
+            <div>
+              <div className="flex items-center gap-2 mb-1.5">
+                <Monitor className="h-4 w-4 text-indigo-500 shrink-0" />
+                <span className="text-xs font-black uppercase tracking-wider text-slate-850 dark:text-white font-display">Site-Wide Trial</span>
+              </div>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed mb-3">
+                Experiment with your custom cursor across the entire browser app!
+              </p>
+            </div>
             <button
-              key={preset.name}
-              onClick={() => loadPreset(index)}
-              className={`group relative text-left p-3.5 rounded-2xl border-2 transition-all cursor-pointer overflow-hidden ${
-                activePresetIndex === index
-                  ? 'border-indigo-600 bg-linear-to-b from-indigo-50/50 to-indigo-100/30 dark:from-indigo-950/40 dark:to-indigo-900/10 dark:border-indigo-450'
-                  : 'border-slate-150 bg-white hover:border-slate-350 dark:border-slate-850 dark:bg-slate-950 dark:hover:border-slate-700'
+              onClick={() => setIsSiteWideActive(!isSiteWideActive)}
+              className={`w-full py-2 px-3 rounded-xl text-[10px] font-black uppercase tracking-wider font-display transition-all cursor-pointer ${
+                isSiteWideActive
+                  ? 'bg-red-500/20 hover:bg-red-500/30 text-red-550 dark:text-red-450 border border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.2)]'
+                  : 'bg-indigo-660 hover:bg-indigo-600 text-white shadow-md border border-indigo-550'
               }`}
             >
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold font-display uppercase tracking-wider text-slate-800 dark:text-slate-200">
-                  {preset.name}
-                </span>
-                <span className="text-[9px] font-mono font-bold text-indigo-600 dark:text-indigo-400">
-                  v0.{index + 1}
-                </span>
-              </div>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">
-                {preset.description}
-              </p>
+              {isSiteWideActive ? '🛑 Remove Cursor' : '🟢 Activate Site-Wide'}
             </button>
-          ))}
+          </div>
         </div>
       </div>
 
       {/* Main Workspace Dashboard */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Controls Panel */}
         <div className="lg:col-span-5 space-y-6">
           <div className="bg-white dark:bg-slate-950 border-2 border-slate-150 dark:border-slate-850 rounded-3xl p-6 shadow-sm">
@@ -1135,8 +1158,8 @@ export default function CustomCursor() {
           </div>
         </div>
 
-        {/* Viewport & Export Output Code Column */}
-        <div className="lg:col-span-7 space-y-6">
+        {/* RIGHT COLUMN: PREVIEW STAGE & CODE EXPORTERS */}
+        <div className="lg:col-span-7 space-y-6 lg:sticky lg:top-24">
           
           {/* Real-time Viewport Stage */}
           <div 
@@ -1319,84 +1342,86 @@ export default function CustomCursor() {
             )}
           </div>
 
-          {/* Export Code Cards container */}
-          <div className="bg-white dark:bg-slate-950 border-2 border-slate-150 dark:border-slate-850 rounded-3xl p-6 shadow-sm overflow-hidden">
-            
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-5 pb-3 border-b border-slate-150 dark:border-slate-850">
-              <div className="flex items-center gap-2">
-                <Code className="h-5 w-5 text-indigo-650 dark:text-indigo-400" />
-                <h3 className="text-md font-black uppercase tracking-wider font-display text-slate-850 dark:text-white">
-                  Developer Implementation Recipes
-                </h3>
-              </div>
+        </div>
+      </div>
 
-              {/* Code format toggle buttons */}
-              <div className="flex bg-slate-100 dark:bg-slate-900 p-1 rounded-xl">
-                {[
-                  { id: 'html-css', label: 'HTML & CSS' },
-                  { id: 'react', label: 'React / TS' },
-                  { id: 'js', label: 'Vanilla JS' }
-                ].map((recipeTab) => (
-                  <button
-                    key={recipeTab.id}
-                    onClick={() => setActiveCodeTab(recipeTab.id as any)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-black uppercase tracking-wider font-display transition-all cursor-pointer ${
-                      activeCodeTab === recipeTab.id
-                        ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm'
-                        : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-350'
-                    }`}
-                  >
-                    {recipeTab.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Code presentation stage */}
-            <div className="relative">
-              <pre className="p-4 bg-slate-900 dark:bg-slate-1000 rounded-2xl overflow-x-auto text-[11px] font-mono text-slate-200 dark:text-slate-300 leading-relaxed max-h-[290px] scrollbar-thin">
-                {activeCodeTab === 'html-css' && getHtmlCssCode()}
-                {activeCodeTab === 'react' && getReactCode()}
-                {activeCodeTab === 'js' && getJsCode()}
-              </pre>
-
-              {/* Float Copy Button */}
-              <button
-                onClick={() => {
-                  let textToCopy = '';
-                  if (activeCodeTab === 'html-css') textToCopy = getHtmlCssCode();
-                  if (activeCodeTab === 'react') textToCopy = getReactCode();
-                  if (activeCodeTab === 'js') textToCopy = getJsCode();
-                  triggerCopy(activeCodeTab, textToCopy);
-                }}
-                className="absolute top-4 right-4 bg-slate-800/85 hover:bg-indigo-600 text-white rounded-xl py-1.5 px-3.5 text-xs font-black tracking-wider uppercase font-display border border-slate-700/55 shadow-md flex items-center gap-1.5 transition-all cursor-pointer"
-              >
-                {copiedText === activeCodeTab ? (
-                  <>
-                    <Check className="h-3.5 w-3.5 text-emerald-400" />
-                    Copied!
-                  </>
-                ) : (
-                  <>
-                    <Copy className="h-3.5 w-3.5" />
-                    Copy Code
-                  </>
-                )}
-              </button>
-            </div>
-
-            {/* Helper tips indicator block */}
-            <div className="mt-4 p-4 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-100/40 dark:border-indigo-900/40 flex gap-3 text-slate-650 dark:text-slate-400 text-xs">
-              <Info className="h-5 w-5 text-indigo-500 shrink-0 mt-0.5" />
-              <div className="leading-relaxed">
-                <span className="font-bold text-slate-800 dark:text-slate-200">System Tip: </span>
-                Custom cursors MUST define <code className="bg-slate-100 dark:bg-slate-900 px-1 py-0.5 rounded font-bold text-indigo-600 dark:text-indigo-400">pointer-events: none</code> inside CSS, otherwise clicking interactive components like buttons will fail because the absolute element captures the mouse trigger vectors!
-              </div>
-            </div>
-
+      {/* Export Code Cards container */}
+      <div className="mt-8 bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm overflow-hidden animate-fade-in">
+        
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-5 pb-3 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex items-center gap-2">
+            <Box className="h-4.5 w-4.5 text-indigo-500" />
+            <h3 className="text-md font-black uppercase tracking-wider font-display text-slate-800 dark:text-white">
+              Export Custom Cursor
+            </h3>
           </div>
 
+          {/* Code format toggle buttons */}
+          <div className="flex rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1">
+            {[
+              { id: 'html-css', label: 'HTML & CSS' },
+              { id: 'react', label: 'React / TS' },
+              { id: 'react-tailwind', label: 'React + Tailwind' }
+            ].map((recipeTab) => (
+              <button
+                key={recipeTab.id}
+                onClick={() => setActiveCodeTab(recipeTab.id as any)}
+                className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider font-display rounded-lg transition-all cursor-pointer ${
+                  activeCodeTab === recipeTab.id
+                    ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-705'
+                }`}
+              >
+                {recipeTab.label}
+              </button>
+            ))}
+          </div>
         </div>
+
+        {/* Code presentation stage */}
+        <div className="relative rounded-2xl bg-slate-950 p-5 mt-4 min-h-[140px] border border-slate-800 overflow-x-auto animate-fade-in animate-duration-150">
+          
+          {/* Float Copy Button */}
+          <button
+            onClick={() => {
+              let textToCopy = '';
+              if (activeCodeTab === 'html-css') textToCopy = getHtmlCssCode();
+              if (activeCodeTab === 'react') textToCopy = getReactCode();
+              if (activeCodeTab === 'react-tailwind') textToCopy = getReactTailwindCode();
+              triggerCopy(activeCodeTab, textToCopy);
+            }}
+            className="absolute top-4 right-4 p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 hover:border-slate-700 text-slate-400 cursor-pointer transition-all z-10 flex items-center gap-1.5"
+          >
+            {copiedText === activeCodeTab ? (
+              <>
+                <Check className="h-4.5 w-4.5 text-emerald-500" />
+                <span className="text-[10px] font-black uppercase text-emerald-500 font-display">Copied!</span>
+              </>
+            ) : (
+              <>
+                <Copy className="h-4.5 w-4.5 text-indigo-400" />
+                <span className="text-[10px] font-black uppercase font-display text-slate-300">Copy Code</span>
+              </>
+            )}
+          </button>
+
+          {/* Print Code segment */}
+          <pre className="text-xs font-mono font-bold text-slate-300 text-left whitespace-pre select-all pt-4 leading-normal max-h-[350px] scrollbar-thin">
+            {activeCodeTab === 'html-css' && getHtmlCssCode()}
+            {activeCodeTab === 'react' && getReactCode()}
+            {activeCodeTab === 'react-tailwind' && getReactTailwindCode()}
+          </pre>
+        </div>
+
+        {/* Helper tips indicator block */}
+        <div className="mt-4 p-4 rounded-2xl bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-100/40 dark:border-indigo-900/40 flex gap-3 text-slate-600 dark:text-slate-400 text-xs">
+          <Info className="h-5 w-5 text-indigo-500 shrink-0 mt-0.5" />
+          <div className="leading-relaxed">
+            <span className="font-bold text-slate-800 dark:text-slate-200">System Tip: </span>
+            Custom cursors MUST define <code className="bg-slate-100 dark:bg-slate-900 px-1 py-0.5 rounded font-bold text-indigo-600 dark:text-indigo-400">pointer-events: none</code> inside CSS, otherwise clicking interactive components like buttons will fail because the absolute element captures the mouse trigger vectors!
+          </div>
+        </div>
+
       </div>
 
       {/* GLOBAL CURSOR INJECTOR FOR ACTIVE TRIAL SESSIONS */}

@@ -4,7 +4,7 @@ import {
   Scissors, Plus, Trash2, Sliders, RotateCcw, Copy, Check, 
   Eye, Code, Info, Sparkles, Palette, ArrowRight, 
   HelpCircle, Move, Compass, Lock, Unlock, Grid, EyeOff, Layers,
-  ChevronRight, Circle, Disc, MapPin, Minimize2, Settings
+  ChevronRight, Circle, Disc, MapPin, Minimize2, Settings, Box
 } from 'lucide-react';
 
 type ShapeType = 'polygon' | 'circle' | 'ellipse' | 'inset';
@@ -178,6 +178,7 @@ export default function ClipPathGenerator() {
   const [copiedCSS, setCopiedCSS] = useState<boolean>(false);
   const [copiedTailwind, setCopiedTailwind] = useState<boolean>(false);
   const [copiedSVG, setCopiedSVG] = useState<boolean>(false);
+  const [activeCodeTab, setActiveCodeTab] = useState<'css' | 'tailwind' | 'svg'>('css');
 
   const containerRef = useRef<HTMLDivElement>(null);
   const isDraggingRef = useRef<boolean>(false);
@@ -535,58 +536,49 @@ export default function ClipPathGenerator() {
   };
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto px-4 py-6 sm:py-10 animate-fade-in" id="clippath-workspace">
+    <div className="space-y-8 animate-fade-in" id="clippath-workspace">
       
-      {/* HEADER HERO SECTION */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-150 dark:border-slate-800 pb-6">
-        <div>
-          <div className="flex items-center gap-2 text-indigo-650 dark:text-indigo-400 font-display font-black text-xs uppercase tracking-widest mb-1.5">
-            <Scissors className="h-4 w-4 text-indigo-500 animate-bounce" /> Spatial Shape Studio
-          </div>
-          <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white uppercase font-display sm:text-4xl">
-            Clip-Path Shapes Generator
-          </h1>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 font-display font-medium uppercase tracking-wider">
-            Surgical Vector Canvas For Custom Crop Masks with Circle, Ellipse, Inset & Polygon support
-          </p>
-        </div>
-        
-        {/* Type select */}
-        <div className="flex bg-slate-100 dark:bg-slate-950 p-1.5 rounded-xl border border-slate-205 dark:border-slate-850 self-start md:self-center">
-          {(['polygon', 'circle', 'ellipse', 'inset'] as ShapeType[]).map((type) => (
-            <button
-              key={type}
-              onClick={() => {
-                const companionPreset = Object.entries(PRESETS).find(([_, p]) => p.shapeType === type)?.[0];
-                if (companionPreset) {
-                  applyPreset(companionPreset);
-                } else {
-                  setShapeType(type);
-                }
-              }}
-              className={`px-3 py-1.5 text-xs font-black uppercase tracking-wider font-display rounded-lg transition-all duration-150 cursor-pointer ${
-                shapeType === type
-                  ? 'bg-indigo-650 text-white shadow-xs'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200'
-              }`}
-            >
-              {type}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* QUICK PRESETS CAROUSEL */}
-      <div className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs space-y-3">
-        <div className="flex items-center justify-between">
-          <h3 className="text-xs font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-2 font-display">
-            <Compass className="h-3.5 w-3.5 text-indigo-500" /> Choose Preset Shape
-          </h3>
-          <span className="text-[9px] font-mono bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 font-extrabold uppercase px-2 py-0.5 rounded-full">
-            Ready to use parameters
-          </span>
+      <div className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800/80 pb-4">
+          <div className="flex items-center gap-2">
+            <Compass className="h-4.5 w-4.5 text-indigo-505" />
+            <div>
+              <h3 className="text-sm font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 font-display">
+                Choose Preset Type
+              </h3>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-display font-medium mt-0.5">
+                Switch category and load sample shape parameters
+              </p>
+            </div>
+          </div>
+          
+          {/* Shape type selector category pills */}
+          <div className="flex bg-slate-50 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-800">
+            {(['polygon', 'circle', 'ellipse', 'inset'] as ShapeType[]).map((type) => (
+              <button
+                key={type}
+                onClick={() => {
+                  const companionPreset = Object.entries(PRESETS).find(([_, p]) => p.shapeType === type)?.[0];
+                  if (companionPreset) {
+                    applyPreset(companionPreset);
+                  } else {
+                    setShapeType(type);
+                  }
+                }}
+                className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-wider font-display rounded-lg transition-all duration-150 cursor-pointer ${
+                  shapeType === type
+                    ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-xs'
+                    : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                }`}
+              >
+                {type}
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-2 pb-1">
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-2.5">
           {Object.entries(PRESETS).map(([key, preset]) => (
             <button
               key={key}
@@ -1245,119 +1237,79 @@ export default function ClipPathGenerator() {
       </div>
 
       {/* CORE 12-COLUMN EXPORTER BLOCK */}
-      <div className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs space-y-6 animate-fade-in" id="clippath-exporter">
-        <div className="flex items-center justify-between border-b border-slate-150 dark:border-slate-800 pb-3">
-          <div>
-            <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-2 font-display">
-              <Code className="h-4.5 w-4.5 text-indigo-500 animate-pulse" /> Export CSS Clip-Path Specifications
+      <div className="bg-white dark:bg-slate-950 border-2 border-slate-205 dark:border-slate-800 rounded-3xl p-6 shadow-sm overflow-hidden animate-fade-in mt-8" id="clippath-exporter">
+        
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-5 pb-3 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex items-center gap-2">
+            <Box className="h-4.5 w-4.5 text-indigo-500" />
+            <h3 className="text-md font-black uppercase tracking-wider font-display text-slate-800 dark:text-white">
+              Export CSS Clip-Path Specifications
             </h3>
-            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-display font-medium uppercase tracking-wider mt-0.5">
-              Copy geometric parameters straight into your stylesheet, inline layouts, or tailwind markup configurations
-            </p>
+          </div>
+
+          {/* Code format toggle buttons */}
+          <div className="flex rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1">
+            {[
+              { id: 'css', label: 'Standard CSS' },
+              { id: 'tailwind', label: 'Tailwind CSS' },
+              { id: 'svg', label: 'Inline SVG' }
+            ].map((recipeTab) => (
+              <button
+                key={recipeTab.id}
+                onClick={() => setActiveCodeTab(recipeTab.id as any)}
+                className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider font-display rounded-lg transition-all cursor-pointer ${
+                  activeCodeTab === recipeTab.id
+                    ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                }`}
+              >
+                {recipeTab.label}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* exporters layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Code presentation stage */}
+        <div className="relative rounded-2xl bg-slate-950 p-5 mt-4 min-h-[140px] border border-slate-800 overflow-x-auto animate-fade-in animate-duration-150">
           
-          {/* Exporter 1: CSS Property */}
-          <div className="space-y-2 font-mono flex flex-col justify-between">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-wider text-slate-550 dark:text-slate-400 font-display">
-                <span className="flex items-center gap-1.5"><Sliders className="h-3.5 w-3.5 text-indigo-500" /> 1. Standard CSS Property</span>
-                <button
-                  type="button"
-                  onClick={() => copyToClipboard(generateClipPathCSS(), 'css')}
-                  className="flex items-center gap-1 font-bold text-indigo-650 dark:text-indigo-400 hover:text-indigo-755 transition-colors cursor-pointer"
-                >
-                  {copiedCSS ? (
-                    <>
-                      <Check className="h-3 w-3 text-emerald-500" /> Copied!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3 w-3" /> Copy CSS Rule
-                    </>
-                  )}
-                </button>
-              </div>
-              
-              <div className="relative">
-                <pre className="text-[10.5px] font-mono leading-relaxed bg-slate-950 text-slate-200 border border-slate-900 p-4 rounded-xl overflow-x-auto whitespace-pre selection:bg-indigo-600/40 h-36 flex items-center">
-                  <span className="text-indigo-400">{generateClipPathCSS()}</span>
-                </pre>
-              </div>
-            </div>
-          </div>
+          {/* Float Copy Button */}
+          <button
+            onClick={() => {
+              let textToCopy = '';
+              if (activeCodeTab === 'css') textToCopy = generateClipPathCSS();
+              if (activeCodeTab === 'tailwind') textToCopy = generateClipPathTailwind();
+              if (activeCodeTab === 'svg') textToCopy = generateSVGCode();
+              copyToClipboard(textToCopy, activeCodeTab);
+            }}
+            className="absolute top-4 right-4 p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 hover:border-slate-700 text-slate-400 cursor-pointer transition-all z-10 flex items-center gap-1.5"
+          >
+            {(activeCodeTab === 'css' ? copiedCSS : activeCodeTab === 'tailwind' ? copiedTailwind : copiedSVG) ? (
+              <>
+                <Check className="h-4.5 w-4.5 text-emerald-500" />
+                <span className="text-[10px] font-black uppercase text-emerald-500 font-display">Copied!</span>
+              </>
+            ) : (
+              <>
+                <Copy className="h-4.5 w-4.5 text-indigo-400" />
+                <span className="text-[10px] font-black uppercase font-display text-slate-300">Copy Code</span>
+              </>
+            )}
+          </button>
 
-          {/* Exporter 2: Tailwind CSS Arbitrary Utilities */}
-          <div className="space-y-2 font-mono flex flex-col justify-between">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-wider text-slate-550 dark:text-slate-400 font-display">
-                <span className="flex items-center gap-1.5"><Sparkles className="h-3.5 w-3.5 text-indigo-500" /> 2. Tailwind Arbitrary Class</span>
-                <button
-                  type="button"
-                  onClick={() => copyToClipboard(generateClipPathTailwind(), 'tailwind')}
-                  className="flex items-center gap-1 font-bold text-indigo-650 dark:text-indigo-400 hover:text-indigo-755 transition-colors cursor-pointer"
-                >
-                  {copiedTailwind ? (
-                    <>
-                      <Check className="h-3 w-3 text-emerald-500" /> Copied!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3 w-3" /> Copy Class
-                    </>
-                  )}
-                </button>
-              </div>
-              
-              <div className="relative">
-                <pre className="text-[10.5px] font-mono leading-relaxed bg-slate-50 dark:bg-slate-950 text-slate-705 dark:text-slate-300 border border-slate-150 dark:border-slate-850 p-4 rounded-xl overflow-x-auto whitespace-normal break-all selection:bg-indigo-600/20 h-36 flex items-center">
-                  <span className="text-indigo-650 dark:text-indigo-400 font-bold leading-normal">{generateClipPathTailwind()}</span>
-                </pre>
-              </div>
-            </div>
-          </div>
-
-          {/* Exporter 3: Cross-Browser Inline SVG tag */}
-          <div className="space-y-2 font-mono flex flex-col justify-between">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-wider text-slate-550 dark:text-slate-400 font-display">
-                <span className="flex items-center gap-1.5"><Layers className="h-3.5 w-3.5 text-indigo-500" /> 3. Inline SVG &lt;clipPath&gt;</span>
-                <button
-                  type="button"
-                  onClick={() => copyToClipboard(generateSVGCode(), 'svg')}
-                  className="flex items-center gap-1 font-bold text-indigo-650 dark:text-indigo-400 hover:text-indigo-755 transition-colors cursor-pointer"
-                >
-                  {copiedSVG ? (
-                    <>
-                      <Check className="h-3 w-3 text-emerald-500" /> Copied!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3 w-3" /> Copy SVG Def
-                    </>
-                  )}
-                </button>
-              </div>
-              
-              <div className="relative">
-                <pre className="text-[10.5px] font-mono leading-relaxed bg-slate-950 text-slate-205 border border-slate-900 p-4 rounded-xl overflow-x-auto whitespace-pre selection:bg-indigo-600/40 h-36 flex items-center">
-                  <span className="text-indigo-400">{generateSVGCode()}</span>
-                </pre>
-              </div>
-            </div>
-          </div>
-
+          {/* Print Code segment */}
+          <pre className="text-xs font-mono font-bold text-slate-300 text-left whitespace-pre select-all pt-4 leading-normal max-h-[350px] scrollbar-thin">
+            {activeCodeTab === 'css' && generateClipPathCSS()}
+            {activeCodeTab === 'tailwind' && generateClipPathTailwind()}
+            {activeCodeTab === 'svg' && generateSVGCode()}
+          </pre>
         </div>
 
         {/* Design warning advisory */}
-        <div className="flex gap-3 items-start bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-150 dark:border-slate-850">
+        <div className="flex gap-3 items-start bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-150 dark:border-slate-850 mt-4">
           <Info className="h-4.5 w-4.5 text-indigo-500 shrink-0 mt-0.5" />
           <div className="space-y-1">
-            <h5 className="text-[11px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider font-display font-medium">CSS Masking Architectural Warning</h5>
-            <p className="text-[10.5px] text-slate-550 dark:text-slate-400 leading-relaxed font-display">
+            <h5 className="text-[11px] font-bold text-slate-800 dark:text-slate-205 uppercase tracking-wider font-display font-medium">CSS Masking Architectural Warning</h5>
+            <p className="text-[10.5px] text-slate-550 dark:text-slate-450 leading-relaxed font-display">
               Clip-paths are highly interactive but do not affect document content layout flow. The clipped regions are completely non-interactive (mouse cursor pointer-events are ignored inside clipped areas). Ensure you provide ample padding surrounding responsive blocks to prevent content cut-offs on mobile viewpoints.
             </p>
           </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { 
-  Compass, Maximize, Droplet, Layers, Sparkles, Box, Scissors, ArrowRight, HelpCircle, MousePointer, Grid, Move
+  Compass, Maximize, Droplet, Layers, Sparkles, Box, Scissors, ArrowRight, HelpCircle, MousePointer, Grid, Move, Activity, Loader, Aperture
 } from 'lucide-react';
 import { ActiveTab } from '../types';
 
@@ -22,7 +22,10 @@ export default function RelatedEffects({ activeTab, setActiveTab }: RelatedEffec
     'tooltip',
     'cursor',
     'background-pattern',
-    'transform-playground'
+    'transform-playground',
+    'cubic-bezier',
+    'css-loaders',
+    'filter-effects'
   ];
 
   const isEffectActive = effectsTabs.includes(activeTab);
@@ -30,6 +33,59 @@ export default function RelatedEffects({ activeTab, setActiveTab }: RelatedEffec
   if (!isEffectActive) return null;
 
   const effects = [
+    {
+      id: 'filter-effects' as ActiveTab,
+      label: 'Filter Effects',
+      icon: Aperture,
+      description: 'Interactive image CSS filters. Calibrate custom retro vintage, noir, cyberpunk, saturation, and contrast parameters.',
+      colorClass: 'from-amber-500 via-orange-600 to-rose-600',
+      tag: 'PHOTO FILTERS',
+      demo: (
+        <div className="relative w-full h-16 flex items-center justify-center overflow-hidden bg-slate-900 border border-slate-850 rounded-xl p-2.5">
+          <div className="w-10 h-10 rounded bg-gradient-to-tr from-amber-500 to-rose-500 animate-pulse" style={{ filter: 'hue-rotate(60deg) saturate(1.5) contrast(1.2)' }} />
+        </div>
+      )
+    },
+    {
+      id: 'css-loaders' as ActiveTab,
+      label: 'CSS Loaders',
+      icon: Loader,
+      description: 'Interactive CSS loading indicators with customized size circles, colors, weight lines, speeds, and direct stylesheet exports.',
+      colorClass: 'from-violet-650 via-pink-550 to-indigo-500',
+      tag: 'INDICATORS',
+      demo: (
+        <div className="relative w-full h-16 flex items-center justify-center overflow-hidden bg-slate-900 border border-slate-850 rounded-xl p-2.5">
+          <div className="w-8 h-8 rounded-full border-2 border-indigo-500/20 border-t-indigo-500 border-b-indigo-500 animate-spin" />
+        </div>
+      )
+    },
+    {
+      id: 'cubic-bezier' as ActiveTab,
+      label: 'Cubic Bezier',
+      icon: Activity,
+      description: 'Interactive cubic bezier curve calculator modeled after Cubic Bezier Studio. Adjust vertices with spring overshooting and compare velocities.',
+      colorClass: 'from-indigo-600 via-fuchsia-550 to-pink-500',
+      tag: 'EASING TIMELN',
+      demo: (
+        <div className="relative w-full h-16 flex items-center justify-center overflow-hidden bg-slate-900 border border-slate-800 rounded-xl p-2.5">
+          <div className="relative w-full bg-slate-950 h-5 rounded-full border border-slate-800/80 px-1.5 flex items-center overflow-hidden">
+            <div 
+              style={{ 
+                animation: 'cubic-bounce-demo 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) infinite' 
+              }} 
+              className="w-3.5 h-3.5 rounded-full bg-linear-to-r from-indigo-500 to-pink-500 shadow-md"
+            />
+          </div>
+          <style>{`
+            @keyframes cubic-bounce-demo {
+              0% { transform: translateX(0); }
+              50% { transform: translateX(calc(120%)); }
+              100% { transform: translateX(0); }
+            }
+          `}</style>
+        </div>
+      )
+    },
     {
       id: 'transform-playground' as ActiveTab,
       label: 'Transform Playground',

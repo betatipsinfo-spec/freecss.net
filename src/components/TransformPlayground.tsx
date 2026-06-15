@@ -331,38 +331,8 @@ export default function TransformWidget() {
   return (
     <div className="animate-fade-in relative">
       
-      {/* 1. Header Hero Panel */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-8 rounded-3xl bg-linear-to-r from-indigo-950 via-slate-900 to-fuchsia-950 border-2 border-slate-800 text-white shadow-xl relative overflow-hidden mb-8">
-        <div className="absolute top-0 right-0 h-40 w-40 bg-pink-500/10 blur-3xl rounded-full" />
-        <div className="absolute -bottom-10 left-1/3 h-48 w-48 bg-violet-500/10 blur-3xl rounded-full" />
-
-        <div className="z-10 flex-1">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-pink-500/20 text-pink-300 border border-pink-500/30 text-[10px] font-black uppercase tracking-widest font-display mb-3">
-            <Compass className="h-3 w-3 animate-spin duration-3000" />
-            Interactive 3D Engine
-          </div>
-          <h1 className="text-3xl md:text-4xl font-black tracking-tight font-display text-white mt-1">
-            CSS TRANSFORM <span className="text-pink-400">PLAYGROUND</span>
-          </h1>
-          <p className="text-slate-400 text-sm mt-2 max-w-2xl leading-relaxed">
-            Deconstruct spatial matrix operations in vanilla CSS. Manipulate dimensional yaw, roll, rotational tilt, translation points, and perspective vectors with automatic rendering fallback configurations.
-          </p>
-        </div>
-
-        {/* Global Reset */}
-        <div className="z-10 flex flex-col justify-center">
-          <button 
-            onClick={resetAllParameters}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-800 bg-slate-900/80 hover:bg-slate-850 hover:border-slate-700 text-slate-300 text-xs font-black uppercase tracking-widest font-display shadow-md transition-all cursor-pointer"
-          >
-            <RotateCcw className="h-3.5 w-3.5 text-pink-400" />
-            Reset Matrix
-          </button>
-        </div>
-      </div>
-
       {/* 2. Interactive Presets Deck */}
-      <div className="mb-8 bg-white dark:bg-slate-950 border-2 border-slate-150 dark:border-slate-850 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="mb-8 bg-white dark:bg-slate-950 border-2 border-slate-150 dark:border-slate-850 rounded-3xl p-4.5 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="flex items-center gap-2.5">
           <Palette className="h-5 w-5 text-pink-500" />
           <div>
@@ -375,25 +345,35 @@ export default function TransformWidget() {
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          {TRANSFORM_PRESETS.map((preset, idx) => (
-            <button
-              key={preset.name}
-              onClick={() => loadPreset(idx)}
-              className={`px-3.5 py-2 rounded-xl border-2 text-[10.5px] font-black uppercase tracking-wider font-display transition-all cursor-pointer ${
-                activePresetIndex === idx
-                  ? 'border-pink-500 bg-pink-50/10 dark:bg-pink-950/20 text-pink-650 dark:text-pink-400'
-                  : 'border-slate-200 hover:border-slate-300 dark:border-slate-850 dark:hover:border-slate-800 text-slate-600 dark:text-slate-400'
-              }`}
-            >
-              <span>{preset.name}</span>
-            </button>
-          ))}
+        <div className="flex flex-wrap lg:flex-nowrap items-center gap-3 w-full lg:w-auto justify-between lg:justify-end">
+          <div className="flex flex-wrap gap-2">
+            {TRANSFORM_PRESETS.map((preset, idx) => (
+              <button
+                key={preset.name}
+                onClick={() => loadPreset(idx)}
+                className={`px-3.5 py-1.5 rounded-xl border-2 text-[10.5px] font-black uppercase tracking-wider font-display transition-all cursor-pointer ${
+                  activePresetIndex === idx
+                    ? 'border-pink-500 bg-pink-50/10 dark:bg-pink-950/20 text-pink-650 dark:text-pink-400'
+                    : 'border-slate-200 hover:border-slate-300 dark:border-slate-850 dark:hover:border-slate-800 text-slate-600 dark:text-slate-400'
+                }`}
+              >
+                <span>{preset.name}</span>
+              </button>
+            ))}
+          </div>
+
+          <button 
+            onClick={resetAllParameters}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-rose-200 hover:border-rose-300 dark:border-rose-950/40 bg-rose-50/50 hover:bg-rose-100/50 dark:bg-rose-950/20 text-rose-650 dark:text-rose-400 text-[10.5px] font-black uppercase tracking-wider font-display transition-all cursor-pointer shrink-0"
+          >
+            <RotateCcw className="h-3 w-3" />
+            Reset Matrix
+          </button>
         </div>
       </div>
 
       {/* 3. Global Dashboard Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         {/* LEFT COLUMN: Controls Dashboard */}
         <div className="lg:col-span-5 space-y-6">
@@ -733,8 +713,8 @@ export default function TransformWidget() {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Real-time Live stage preview and Exporter */}
-        <div className="lg:col-span-7 space-y-6">
+        {/* RIGHT COLUMN: PREVIEW STAGE & CODE EXPORTERS */}
+        <div className="lg:col-span-7 space-y-6 lg:sticky lg:top-24">
           
           {/* Real-time Interactive Previews Stage */}
           <div className="bg-white dark:bg-slate-950 border-2 border-slate-150 dark:border-slate-850 rounded-3xl p-5 shadow-sm space-y-4">

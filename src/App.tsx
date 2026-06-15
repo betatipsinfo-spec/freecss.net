@@ -24,10 +24,13 @@ import TooltipGenerator from './components/TooltipGenerator';
 import CustomCursorGenerator from './components/CustomCursorGenerator';
 import BackgroundPatternGenerator from './components/BackgroundPatternGenerator';
 import TransformPlayground from './components/TransformPlayground';
+import CubicBezierGenerator from './components/CubicBezierGenerator';
+import CssLoaders from './components/CssLoaders';
+import FilterEffects from './components/FilterEffects';
 import RelatedEffects from './components/RelatedEffects';
 import BackToTop from './components/BackToTop';
 import { ActiveTab, AppAdminConfig } from './types';
-import { Type, Sparkles, Wand2, ArrowRight } from 'lucide-react';
+import { Type, Sparkles, Wand2, ArrowRight, Grid, Columns, Laptop, BookOpen, Heart, Shield, Aperture, Loader, Activity, Move, Box, Droplet, Scissors, Compass, Layers, Maximize, HelpCircle, MousePointer } from 'lucide-react';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('styler');
@@ -247,6 +250,448 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
+  const getHeaderDetails = () => {
+    switch (activeTab) {
+      case 'styler':
+        return {
+          icon: <Sparkles className="h-3.5 w-3.5" />,
+          tag: 'Professional Font Styler Sandbox',
+          title: adminConfig.playgroundHeaderTitle,
+          subtitle: adminConfig.playgroundHeaderSubtitle,
+          theme: {
+            fromBg: 'from-indigo-950',
+            viaBg: 'via-slate-900',
+            toBg: 'to-fuchsia-950',
+            bgBadge: 'bg-pink-500/20',
+            textBadge: 'text-pink-300',
+            borderBadge: 'border-pink-500/30',
+            textHighlight: 'text-pink-400',
+            glowColor1: 'bg-pink-500/10',
+            glowColor2: 'bg-violet-500/10',
+          }
+        };
+      case 'directory':
+        return {
+          icon: <Grid className="h-3.5 w-3.5" />,
+          tag: 'Global Typography Directory Index',
+          title: 'Web Safe & Google Fonts Catalog',
+          subtitle: 'Search, test, and filter across hundreds of standard web safe font configurations and Google Font definitions.',
+          theme: {
+            fromBg: 'from-sky-950',
+            viaBg: 'via-slate-900',
+            toBg: 'to-emerald-900/50',
+            bgBadge: 'bg-emerald-500/20',
+            textBadge: 'text-emerald-300',
+            borderBadge: 'border-emerald-500/30',
+            textHighlight: 'text-emerald-400',
+            glowColor1: 'bg-sky-500/10',
+            glowColor2: 'bg-emerald-500/10',
+          }
+        };
+      case 'compare':
+        return {
+          icon: <Columns className="h-3.5 w-3.5" />,
+          tag: 'Comparative Rendering Sandbox',
+          title: 'Side-by-Side Typography Contrast',
+          subtitle: 'Compare letter spacing, weights, kerning, line-height constraints, and reading flow in real-time side-by-side viewports.',
+          theme: {
+            fromBg: 'from-orange-950',
+            viaBg: 'via-slate-900',
+            toBg: 'to-red-950',
+            bgBadge: 'bg-orange-500/20',
+            textBadge: 'text-orange-300',
+            borderBadge: 'border-orange-500/30',
+            textHighlight: 'text-orange-400',
+            glowColor1: 'bg-orange-500/10',
+            glowColor2: 'bg-rose-500/10',
+          }
+        };
+      case 'compatibility':
+        return {
+          icon: <Laptop className="h-3.5 w-3.5" />,
+          tag: 'Platform Support Safety Matrix',
+          title: 'Universal Browser Safety Index',
+          subtitle: 'Detailed coverage calculations across Apple iOS, Google Android, Windows, macOS, and Linux system-safe presets.',
+          theme: {
+            fromBg: 'from-purple-950',
+            viaBg: 'via-slate-900',
+            toBg: 'to-yellow-950',
+            bgBadge: 'bg-yellow-500/20',
+            textBadge: 'text-yellow-300',
+            borderBadge: 'border-yellow-500/30',
+            textHighlight: 'text-yellow-400',
+            glowColor1: 'bg-yellow-500/10',
+            glowColor2: 'bg-purple-500/10',
+          }
+        };
+      case 'cheatsheet':
+        return {
+          icon: <BookOpen className="h-3.5 w-3.5" />,
+          tag: 'CSS Typography Code Snippets',
+          title: 'CSS Font-Family Cheat Sheet',
+          subtitle: 'Grab production-ready modular boilerplate configurations, safe cascading fallbacks, and standard template styles.',
+          theme: {
+            fromBg: 'from-slate-900',
+            viaBg: 'via-zinc-900',
+            toBg: 'to-neutral-900',
+            bgBadge: 'bg-slate-500/20',
+            textBadge: 'text-slate-300',
+            borderBadge: 'border-slate-500/30',
+            textHighlight: 'text-white',
+            glowColor1: 'bg-slate-500/10',
+            glowColor2: 'bg-neutral-500/10',
+          }
+        };
+      case 'favorites':
+        return {
+          icon: <Heart className="h-3.5 w-3.5 text-rose-500" />,
+          tag: 'Saved Typography Workspace',
+          title: 'My Saved Fonts Portfolio',
+          subtitle: 'Your hand-picked selection of high-fidelity fonts. Review, adjust custom parameters, and generate consolidated stylesheets.',
+          theme: {
+            fromBg: 'from-rose-950',
+            viaBg: 'via-slate-900',
+            toBg: 'to-amber-950',
+            bgBadge: 'bg-rose-500/20',
+            textBadge: 'text-rose-300',
+            borderBadge: 'border-rose-500/30',
+            textHighlight: 'text-rose-400',
+            glowColor1: 'bg-rose-500/10',
+            glowColor2: 'bg-red-500/10',
+          }
+        };
+      case 'admin':
+        return {
+          icon: <Shield className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" />,
+          tag: 'Administrative Control Center',
+          title: 'System Preferences & CMS Customizer',
+          subtitle: 'Fine-tune branding identities, custom site slogans, logo paths, meta headers, and SEO declarations in real-time.',
+          theme: {
+            fromBg: 'from-blue-950',
+            viaBg: 'via-slate-900',
+            toBg: 'to-indigo-950',
+            bgBadge: 'bg-blue-500/20',
+            textBadge: 'text-blue-300',
+            borderBadge: 'border-blue-500/30',
+            textHighlight: 'text-blue-400',
+            glowColor1: 'bg-blue-500/10',
+            glowColor2: 'bg-indigo-500/10',
+          }
+        };
+      case 'filter-effects':
+        return {
+          icon: <Aperture className="h-3.5 w-3.5 text-amber-500 animate-spin-slow" />,
+          tag: 'GPU Accelerated Filter Effects',
+          title: 'CSS Filter Effects Workbench',
+          subtitle: 'Design, coordinate, and export optimized CSS image styles by layering contrast, brightness, sepia, hue-rotation, saturation, and blur.',
+          theme: {
+            fromBg: 'from-amber-950',
+            viaBg: 'via-slate-900',
+            toBg: 'to-orange-950',
+            bgBadge: 'bg-amber-500/20',
+            textBadge: 'text-amber-300',
+            borderBadge: 'border-amber-500/30',
+            textHighlight: 'text-amber-400',
+            glowColor1: 'bg-amber-500/10',
+            glowColor2: 'bg-orange-500/10',
+          }
+        };
+      case 'css-loaders':
+        return {
+          icon: <Loader className="h-3.5 w-3.5 text-violet-500 animate-spin" />,
+          tag: 'Procedural Keyframe Indicators',
+          title: 'Pure CSS Loaders & Spinner Studio',
+          subtitle: 'Build fluid, lightweight high-performance loading rings, spinner loops, bouncing indicators, and glowing loaders.',
+          theme: {
+            fromBg: 'from-violet-950',
+            viaBg: 'via-slate-900',
+            toBg: 'to-fuchsia-950',
+            bgBadge: 'bg-fuchsia-500/20',
+            textBadge: 'text-fuchsia-300',
+            borderBadge: 'border-fuchsia-500/30',
+            textHighlight: 'text-fuchsia-400',
+            glowColor1: 'bg-fuchsia-500/10',
+            glowColor2: 'bg-violet-500/10',
+          }
+        };
+      case 'cubic-bezier':
+        return {
+          icon: <Activity className="h-3.5 w-3.5 text-emerald-500" />,
+          tag: 'Temporal Velocity Interpolator',
+          title: 'Cubic Bezier Easing Designer',
+          subtitle: 'Construct beautiful transitions with springy custom easing parameters. Test and race kinetic objects on synchronized speed tracks.',
+          theme: {
+            fromBg: 'from-emerald-950',
+            viaBg: 'via-slate-900',
+            toBg: 'to-green-950',
+            bgBadge: 'bg-emerald-500/20',
+            textBadge: 'text-emerald-300',
+            borderBadge: 'border-emerald-500/30',
+            textHighlight: 'text-emerald-400',
+            glowColor1: 'bg-emerald-500/10',
+            glowColor2: 'bg-teal-500/10',
+          }
+        };
+
+      case 'tooltip':
+        return {
+          icon: <HelpCircle className="h-3.5 w-3.5 text-amber-500" />,
+          tag: 'Responsive Contextual Bubbles',
+          title: 'CSS Tooltip & Arrow Customizer',
+          subtitle: 'Build beautifully animated tooltip overlays with customized alignment positions, arrow anchors, and seamless entry loops.',
+          theme: {
+            fromBg: 'from-amber-950',
+            viaBg: 'via-slate-900',
+            toBg: 'to-violet-950',
+            bgBadge: 'bg-amber-500/20',
+            textBadge: 'text-amber-300',
+            borderBadge: 'border-amber-500/30',
+            textHighlight: 'text-yellow-400',
+            glowColor1: 'bg-amber-500/10',
+            glowColor2: 'bg-purple-500/10',
+          }
+        };
+      case 'border-radius':
+        return {
+          icon: <Maximize className="h-3.5 w-3.5 text-teal-500" />,
+          tag: '8-Point Asymmetrical Geometry',
+          title: 'Organic Border-Radius Shape Maker',
+          subtitle: 'Slide 8 coordinates independently to sculpt gorgeous, morphing liquid cards, abstract avatars, and fluid button anchors.',
+          theme: {
+            fromBg: 'from-teal-950',
+            viaBg: 'via-slate-900',
+            toBg: 'to-emerald-950',
+            bgBadge: 'bg-teal-500/20',
+            textBadge: 'text-teal-300',
+            borderBadge: 'border-teal-500/30',
+            textHighlight: 'text-teal-400',
+            glowColor1: 'bg-teal-500/10',
+            glowColor2: 'bg-emerald-500/10',
+          }
+        };
+      case 'backdrop-filter':
+        return {
+          icon: <Layers className="h-3.5 w-3.5 text-indigo-500" />,
+          tag: 'Compositor Backdrop Processing',
+          title: 'Backdrop Filter & Glassmorphism Lab',
+          subtitle: 'Calibrate frosted overlays that dynamically colorize and blur whatever renders directly behind them in real-time.',
+          theme: {
+            fromBg: 'from-purple-950',
+            viaBg: 'via-slate-900',
+            toBg: 'to-pink-950',
+            bgBadge: 'bg-purple-500/20',
+            textBadge: 'text-purple-300',
+            borderBadge: 'border-purple-500/30',
+            textHighlight: 'text-fuchsia-400',
+            glowColor1: 'bg-purple-500/10',
+            glowColor2: 'bg-pink-500/10',
+          }
+        };
+      case 'neumorphism':
+        return {
+          icon: <Compass className="h-3.5 w-3.5 text-orange-500" />,
+          tag: 'Skeuomorphic Soft UI Coordinates',
+          title: 'Neumorphic Shadow & Accent Studio',
+          subtitle: 'Create tactile extrusion layers and soft-shadow recesses by mapping dynamic light sources and custom luminance angles.',
+          theme: {
+            fromBg: 'from-slate-900',
+            viaBg: 'via-zinc-900',
+            toBg: 'to-orange-950',
+            bgBadge: 'bg-orange-500/20',
+            textBadge: 'text-orange-300',
+            borderBadge: 'border-orange-500/30',
+            textHighlight: 'text-orange-400',
+            glowColor1: 'bg-amber-500/10',
+            glowColor2: 'bg-yellow-500/10',
+          }
+        };
+      case 'clippath':
+        return {
+          icon: <Scissors className="h-3.5 w-3.5 text-pink-500" />,
+          tag: 'Vector Mask Path Intersection',
+          title: 'CSS Clip-Path Polygon Designer',
+          subtitle: 'Design custom geometric crop masks by dragging viewport nodes to create stars, badges, arrows, or custom vectors.',
+          theme: {
+            fromBg: 'from-pink-950',
+            viaBg: 'via-slate-900',
+            toBg: 'to-purple-900',
+            bgBadge: 'bg-pink-500/20',
+            textBadge: 'text-pink-300',
+            borderBadge: 'border-pink-500/30',
+            textHighlight: 'text-pink-400',
+            glowColor1: 'bg-pink-500/10',
+            glowColor2: 'bg-indigo-500/10',
+          }
+        };
+      case 'glass':
+        return {
+          icon: <Droplet className="h-3.5 w-3.5 text-sky-500" />,
+          tag: 'Frosted Glass Layering Workspace',
+          title: 'Liquid Glassmorphism Designer',
+          subtitle: 'Layer specular highlight reflections, translucency, base blurs, and glass layers behind responsive vectors.',
+          theme: {
+            fromBg: 'from-blue-950',
+            viaBg: 'via-slate-900',
+            toBg: 'to-teal-950',
+            bgBadge: 'bg-blue-500/20',
+            textBadge: 'text-blue-300',
+            borderBadge: 'border-blue-500/30',
+            textHighlight: 'text-sky-400',
+            glowColor1: 'bg-blue-500/10',
+            glowColor2: 'bg-teal-500/10',
+          }
+        };
+      case 'shadow':
+        return {
+          icon: <Box className="h-3.5 w-3.5 text-indigo-500" />,
+          tag: 'Concentric Layered Ambient Lighting',
+          title: 'Advanced CSS Box Shadow Architect',
+          subtitle: 'Layer up to 5 individual shadow layers to build realistic physical depth, soft penumbral spreads, and dark glows.',
+          theme: {
+            fromBg: 'from-indigo-950',
+            viaBg: 'via-slate-900',
+            toBg: 'to-violet-950',
+            bgBadge: 'bg-indigo-500/20',
+            textBadge: 'text-indigo-300',
+            borderBadge: 'border-indigo-500/30',
+            textHighlight: 'text-violet-400',
+            glowColor1: 'bg-indigo-500/10',
+            glowColor2: 'bg-purple-500/10',
+          }
+        };
+      case 'effects':
+        return {
+          icon: <Sparkles className="h-3.5 w-3.5 text-fuchsia-500" />,
+          tag: 'Tactile Browser Interactions',
+          title: 'CSS Hover Effects & Animation Engine',
+          subtitle: 'Coordinate smooth hover state transitions, custom background fills, scaling offsets, and subtle border highlights.',
+          theme: {
+            fromBg: 'from-fuchsia-950',
+            viaBg: 'via-slate-900',
+            toBg: 'to-amber-950',
+            bgBadge: 'bg-fuchsia-500/20',
+            textBadge: 'text-fuchsia-300',
+            borderBadge: 'border-fuchsia-500/30',
+            textHighlight: 'text-fuchsia-400',
+            glowColor1: 'bg-fuchsia-500/10',
+            glowColor2: 'bg-orange-500/10',
+          }
+        };
+      case 'about':
+        return {
+          icon: <BookOpen className="h-3.5 w-3.5 text-emerald-500" />,
+          tag: 'Platform Evolution & Mission',
+          title: 'About Our Creative Suite',
+          subtitle: 'Learn more about the technology stack, core features, styling architecture, and engineering principles behind our playground.',
+          theme: {
+            fromBg: 'from-emerald-950',
+            viaBg: 'via-slate-900',
+            toBg: 'to-cyan-950',
+            bgBadge: 'bg-emerald-500/20',
+            textBadge: 'text-emerald-300',
+            borderBadge: 'border-emerald-500/30',
+            textHighlight: 'text-emerald-400',
+            glowColor1: 'bg-emerald-500/10',
+            glowColor2: 'bg-cyan-500/10',
+          }
+        };
+      case 'privacy':
+        return {
+          icon: <Shield className="h-3.5 w-3.5 text-blue-500" />,
+          tag: 'User Trust & Safety Standards',
+          title: 'Platform Privacy Protection Policy',
+          subtitle: 'Learn how we secure your custom configurations, browser memory persistence, safety preferences, and workspace designs.',
+          theme: {
+            fromBg: 'from-blue-950',
+            viaBg: 'via-slate-900',
+            toBg: 'to-indigo-950',
+            bgBadge: 'bg-blue-500/20',
+            textBadge: 'text-blue-300',
+            borderBadge: 'border-blue-500/30',
+            textHighlight: 'text-blue-400',
+            glowColor1: 'bg-blue-500/10',
+            glowColor2: 'bg-indigo-500/10',
+          }
+        };
+      case 'terms':
+        return {
+          icon: <BookOpen className="h-3.5 w-3.5 text-amber-500" />,
+          tag: 'Workspace Rules & Guidelines',
+          title: 'Interactive Terms of Service',
+          subtitle: 'Guidelines, rights, usage boundaries, and sandbox specifications for our public utility modules.',
+          theme: {
+            fromBg: 'from-amber-955',
+            viaBg: 'via-slate-900',
+            toBg: 'to-rose-955',
+            bgBadge: 'bg-amber-500/20',
+            textBadge: 'text-amber-300',
+            borderBadge: 'border-amber-500/30',
+            textHighlight: 'text-amber-400',
+            glowColor1: 'bg-amber-500/10',
+            glowColor2: 'bg-rose-500/10',
+          }
+        };
+      case 'background-pattern':
+        return {
+          icon: <Sparkles className="h-3.5 w-3.5 text-violet-500" />,
+          tag: 'CSS Studio Engine',
+          title: 'Background Patterns Generator',
+          subtitle: 'Architect custom grids, blueprint meshes, waves, and diagonal stripe background textures. Combine linear gradients and inlined SVGs into performant css assets instantly.',
+          theme: {
+            fromBg: 'from-violet-950',
+            viaBg: 'via-slate-900',
+            toBg: 'to-indigo-950',
+            bgBadge: 'bg-violet-500/20',
+            textBadge: 'text-violet-300',
+            borderBadge: 'border-violet-500/30',
+            textHighlight: 'text-violet-400',
+            glowColor1: 'bg-violet-500/10',
+            glowColor2: 'bg-indigo-500/10',
+          }
+        };
+      case 'cursor':
+        return {
+          icon: <MousePointer className="h-3.5 w-3.5 text-indigo-500" />,
+          tag: 'CSS Customization Engine',
+          title: 'Custom CSS Cursor Generator',
+          subtitle: 'Create high-performance, dynamic custom cursors with fluid lag interpolation filters, reactive click animations, tail nodes, and clean CSS + React hooks.',
+          theme: {
+            fromBg: 'from-indigo-950',
+            viaBg: 'via-slate-900',
+            toBg: 'to-blue-950',
+            bgBadge: 'bg-indigo-500/20',
+            textBadge: 'text-indigo-300',
+            borderBadge: 'border-indigo-500/30',
+            textHighlight: 'text-indigo-400',
+            glowColor1: 'bg-indigo-500/10',
+            glowColor2: 'bg-purple-500/10',
+          }
+        };
+      case 'transform-playground':
+        return {
+          icon: <Move className="h-3.5 w-3.5 text-pink-500" />,
+          tag: 'Interactive 3D Engine',
+          title: 'CSS Transform Playground',
+          subtitle: 'Deconstruct spatial matrix operations in vanilla CSS. Manipulate dimensional yaw, roll, rotational tilt, translation points, and perspective vectors with automatic rendering fallback configurations.',
+          theme: {
+            fromBg: 'from-indigo-950',
+            viaBg: 'via-slate-900',
+            toBg: 'to-fuchsia-950',
+            bgBadge: 'bg-pink-500/20',
+            textBadge: 'text-pink-300',
+            borderBadge: 'border-pink-500/30',
+            textHighlight: 'text-pink-400',
+            glowColor1: 'bg-pink-500/10',
+            glowColor2: 'bg-violet-500/10',
+          }
+        };
+      default:
+        return null;
+    }
+  };
+
+  const headerDetails = getHeaderDetails();
+
   return (
     <div className="min-h-screen flex flex-col justify-between bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
       
@@ -265,21 +710,42 @@ export default function App() {
       {/* 2. Main Layout Shell */}
       <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
-        {/* Dynamic Premium Hero Greeting Header - displays prominently on main views */}
-        {(activeTab === 'styler' || activeTab === 'directory' || activeTab === 'favorites' || activeTab === 'admin') && (
-          <div className="mb-10 text-center space-y-4 max-w-4xl mx-auto py-4">
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-50 dark:bg-indigo-950/50 text-indigo-100 dark:text-indigo-400 border border-indigo-200/50 dark:border-indigo-900/50 uppercase tracking-wider font-display">
-              <Sparkles className="h-3.5 w-3.5" />
-              <span>Free Interactive CSS Font Tools & Generator Suite</span>
+        {/* Dynamic Premium Hero Greeting Header - displays prominently on main views and sub-tool interfaces */}
+        {headerDetails && (() => {
+          const titleWords = headerDetails.title.split(' ');
+          const lastWord = titleWords.pop() || '';
+          const restOfTitle = titleWords.join(' ');
+          const configTheme = headerDetails.theme || {
+            fromBg: 'from-indigo-950',
+            viaBg: 'via-slate-900',
+            toBg: 'to-fuchsia-950',
+            bgBadge: 'bg-pink-500/20',
+            textBadge: 'text-pink-300',
+            borderBadge: 'border-pink-500/30',
+            textHighlight: 'text-pink-400',
+            glowColor1: 'bg-pink-500/10',
+            glowColor2: 'bg-violet-500/10',
+          };
+          return (
+            <div className={`flex flex-col md:flex-row md:items-center justify-between gap-6 p-8 rounded-3xl bg-linear-to-r ${configTheme.fromBg} ${configTheme.viaBg} ${configTheme.toBg} border-2 border-slate-200 dark:border-slate-800 text-white shadow-xl relative overflow-hidden mb-10 animate-fade-in`}>
+              <div className={`absolute top-0 right-0 h-40 w-40 ${configTheme.glowColor1} blur-3xl rounded-full`} />
+              <div className={`absolute -bottom-10 left-1/3 h-48 w-48 ${configTheme.glowColor2} blur-3xl rounded-full`} />
+
+              <div className="z-10 flex-1">
+                <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full ${configTheme.bgBadge} ${configTheme.textBadge} border ${configTheme.borderBadge} text-[10px] font-black uppercase tracking-widest font-display mb-4 hover:scale-[1.02] transition-transform`}>
+                  {headerDetails.icon}
+                  <span>{headerDetails.tag}</span>
+                </div>
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight font-display text-white mt-1 uppercase">
+                  {restOfTitle} <span className={configTheme.textHighlight}>{lastWord}</span>
+                </h1>
+                <p className="text-slate-400 text-xs sm:text-sm mt-2.5 max-w-3xl leading-relaxed">
+                  {headerDetails.subtitle}
+                </p>
+              </div>
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 dark:text-white font-display leading-tight uppercase">
-              {adminConfig.playgroundHeaderTitle}
-            </h1>
-            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed font-normal">
-              {adminConfig.playgroundHeaderSubtitle}
-            </p>
-          </div>
-        )}
+          );
+        })()}
 
         {/* 3. Render Active view with animations */}
         <section className="transition-all duration-200" id="main-content-section">
@@ -354,6 +820,18 @@ export default function App() {
 
           {activeTab === 'transform-playground' && (
             <TransformPlayground />
+          )}
+
+          {activeTab === 'cubic-bezier' && (
+            <CubicBezierGenerator />
+          )}
+
+          {activeTab === 'css-loaders' && (
+            <CssLoaders />
+          )}
+
+          {activeTab === 'filter-effects' && (
+            <FilterEffects />
           )}
 
           {activeTab === 'compatibility' && (

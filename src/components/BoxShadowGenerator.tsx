@@ -124,6 +124,8 @@ export default function BoxShadowGenerator() {
   // Copy success feedback states
   const [copiedCSS, setCopiedCSS] = useState<boolean>(false);
   const [copiedTailwind, setCopiedTailwind] = useState<boolean>(false);
+  const [copiedReact, setCopiedReact] = useState<boolean>(false);
+  const [activeCodeTab, setActiveCodeTab] = useState<'css' | 'tailwind' | 'react'>('css');
 
   const dragAreaRef = useRef<HTMLDivElement>(null);
   const [isDraggingJoystick, setIsDraggingJoystick] = useState<boolean>(false);
@@ -234,6 +236,12 @@ export default function BoxShadowGenerator() {
     return `shadow-[${cleanParts}]`;
   };
 
+  // Build React Multi-Shadow Inline Style String
+  const generateReactValue = () => {
+    const shadowVal = generateShadowStyle().replace(/\n/g, '\n    ');
+    return `const ShadowCard = () => {\n  return (\n    <div\n      style={{\n        boxShadow: "${shadowVal}"\n      }}\n    />\n  );\n};`;
+  };
+
   // Handle Joystick drag implementation
   const handleJoystickMove = (clientX: number, clientY: number) => {
     if (!dragAreaRef.current || !activeLayer) return;
@@ -293,14 +301,17 @@ export default function BoxShadowGenerator() {
     }
   };
 
-  const copyToClipboard = (text: string, type: 'css' | 'tailwind') => {
+  const copyToClipboard = (text: string, type: 'css' | 'tailwind' | 'react') => {
     navigator.clipboard.writeText(text);
     if (type === 'css') {
       setCopiedCSS(true);
       setTimeout(() => setCopiedCSS(false), 2000);
-    } else {
+    } else if (type === 'tailwind') {
       setCopiedTailwind(true);
       setTimeout(() => setCopiedTailwind(false), 2000);
+    } else {
+      setCopiedReact(true);
+      setTimeout(() => setCopiedReact(false), 2000);
     }
   };
 
@@ -320,28 +331,6 @@ export default function BoxShadowGenerator() {
   return (
     <div className="space-y-10 animate-fade-in py-2">
       
-      {/* Dynamic App Title Segment */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-6 mb-2">
-        <div>
-          <div className="inline-flex items-center gap-1.5 text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/30 px-2.5 py-1 rounded-lg border border-indigo-100 dark:border-indigo-900/30 uppercase tracking-widest font-mono">
-            <Flame className="h-3 w-3" /> Visual Suite
-          </div>
-          <h2 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tight font-display mt-2.5">
-            Shadow Lab <span className="text-indigo-500 font-normal lowercase italic font-sans text-xl ml-1">layer designer</span>
-          </h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-xl">
-            Simultaneously overlay multiple ambient shadows, direct offset vectors with an interactive drag joystick, and export clean standards-compliant CSS structures instantly.
-          </p>
-        </div>
-        
-        <button
-          onClick={handleReset}
-          className="self-start md:self-center flex items-center gap-2 px-3 py-1.5 text-xs text-slate-505 hover:text-indigo-650 dark:text-slate-400 dark:hover:text-indigo-455 hover:bg-slate-100 dark:hover:bg-slate-900 border border-slate-205 dark:border-slate-800 rounded-xl font-bold uppercase tracking-wider font-display transition-all duration-150 cursor-pointer"
-        >
-          <RefreshCw className="h-3 w-3" /> Reset Lab
-        </button>
-      </div>
-
       {/* Grid Layout Container */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
@@ -350,9 +339,17 @@ export default function BoxShadowGenerator() {
           
           {/* Preset Cards Selectors */}
           <div className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs">
-            <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2 font-display">
-              <Wand2 className="h-4 w-4 text-violet-500" /> Loaded Quick-Presets
-            </h3>
+            <div className="flex items-center justify-between mb-3 font-display">
+              <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                <Wand2 className="h-4 w-4 text-violet-500" /> Loaded Quick-Presets
+              </h3>
+              <button
+                onClick={handleReset}
+                className="flex items-center gap-1.5 px-2.5 py-1 text-[10px] text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg font-black uppercase tracking-wider transition-all duration-150 cursor-pointer"
+              >
+                <RefreshCw className="h-3 w-3" /> Reset Lab
+              </button>
+            </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {Object.entries(PRESETS).map(([key, item]) => (
                 <button
@@ -675,8 +672,8 @@ export default function BoxShadowGenerator() {
 
         </div>
 
-        {/* RIGHT COLUMN: Canvas Live Preview & Code Generator (5 cols) */}
-        <div className="lg:col-span-5 space-y-6">
+        {/* RIGHT COLUMN: PREVIEW STAGE & CODE EXPORTERS */}
+        <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-24">
           
           {/* Canvas Preview Sandbox */}
           <div className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs flex flex-col gap-4">
@@ -837,86 +834,84 @@ export default function BoxShadowGenerator() {
       </div>
 
       {/* CODE EXPORTER PANEL - Full Width 12-column Section */}
-      <div className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xs space-y-6 animate-fade-in">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
-          <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-2.5 font-display">
-            <Code className="h-5 w-5 text-indigo-505" /> Export System Stylesheet
-          </h3>
-          <p className="text-[11px] text-slate-450 dark:text-slate-500 max-w-md text-left sm:text-right font-display uppercase tracking-wider font-bold">
-            Stack multiple shadow layers so colors blend dynamically to construct physically accurate element depth.
-          </p>
+      <div className="bg-white dark:bg-slate-950 border-2 border-slate-205 dark:border-slate-800 rounded-3xl p-6 shadow-sm overflow-hidden animate-fade-in mt-8" id="shadow-exporter">
+        
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-5 pb-3 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex items-center gap-2">
+            <Box className="h-4.5 w-4.5 text-indigo-500" />
+            <h3 className="text-md font-black uppercase tracking-wider font-display text-slate-800 dark:text-white">
+              Export System Stylesheet
+            </h3>
+          </div>
+
+          {/* Code format toggle buttons */}
+          <div className="flex rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1">
+            {[
+              { id: 'css', label: 'Standard CSS' },
+              { id: 'tailwind', label: 'Tailwind CSS' },
+              { id: 'react', label: 'React Inline' }
+            ].map((recipeTab) => (
+              <button
+                key={recipeTab.id}
+                onClick={() => setActiveCodeTab(recipeTab.id as any)}
+                className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider font-display rounded-lg transition-all cursor-pointer ${
+                  activeCodeTab === recipeTab.id
+                    ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                }`}
+              >
+                {recipeTab.label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* 1 Row, 2 Columns layout on md screen and larger */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Code presentation stage */}
+        <div className="relative rounded-2xl bg-slate-950 p-5 mt-4 min-h-[140px] border border-slate-800 overflow-x-auto animate-fade-in animate-duration-150">
           
-          {/* Standard CSS Code Segment (Column 1) */}
-          <div className="space-y-2 font-mono flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-slate-450 dark:text-slate-500 font-display">
-                <span>1. Standard CSS Property</span>
-                <button
-                  type="button"
-                  onClick={() => copyToClipboard(`box-shadow: ${generateShadowStyle()};`, 'css')}
-                  className="flex items-center gap-1.5 text-[11px] font-bold text-indigo-650 dark:text-indigo-400 hover:text-indigo-705 dark:hover:text-indigo-305 transition-colors cursor-pointer"
-                >
-                  {copiedCSS ? (
-                    <>
-                      <Check className="h-3.5 w-3.5 text-emerald-500" /> Copied!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3.5 w-3.5" /> Copy CSS Rule
-                    </>
-                  )}
-                </button>
-              </div>
+          {/* Float Copy Button */}
+          <button
+            onClick={() => {
+              let textToCopy = '';
+              if (activeCodeTab === 'css') textToCopy = `box-shadow: ${generateShadowStyle()};`;
+              if (activeCodeTab === 'tailwind') textToCopy = generateTailwindValue();
+              if (activeCodeTab === 'react') textToCopy = generateReactValue();
+              copyToClipboard(textToCopy, activeCodeTab);
+            }}
+            className="absolute top-4 right-4 p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 hover:border-slate-700 text-slate-400 cursor-pointer transition-all z-10 flex items-center gap-1.5"
+          >
+            {(activeCodeTab === 'css' ? copiedCSS : activeCodeTab === 'tailwind' ? copiedTailwind : copiedReact) ? (
+              <>
+                <Check className="h-4.5 w-4.5 text-emerald-500" />
+                <span className="text-[10px] font-black uppercase text-emerald-500 font-display">Copied!</span>
+              </>
+            ) : (
+              <>
+                <Copy className="h-4.5 w-4.5 text-indigo-400" />
+                <span className="text-[10px] font-black uppercase font-display text-slate-300">Copy Code</span>
+              </>
+            )}
+          </button>
 
-              <div className="relative mt-2">
-                <pre className="text-[11px] font-mono leading-relaxed bg-slate-900 text-slate-200 border border-slate-955 p-4.5 rounded-2xl overflow-x-auto whitespace-pre selection:bg-indigo-600/35 shadow-sm max-h-56">
-                  <code className="text-emerald-450">box-shadow</code>: {generateShadowStyle()};
-                </pre>
-              </div>
-            </div>
-            <p className="text-[10px] text-slate-450/90 leading-relaxed mt-2.5">
-              Copy standard stylesheet rule for cross-browser native runtime rendering on arbitrary styled container elements.
-            </p>
-          </div>
-
-          {/* Tailwind Arbitrary values config code (Column 2) */}
-          <div className="space-y-2 font-mono flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-wider text-slate-450 dark:text-slate-500 font-display">
-                <span>2. Tailwind CSS Arbitrary Class</span>
-                <button
-                  type="button"
-                  onClick={() => copyToClipboard(generateTailwindValue(), 'tailwind')}
-                  className="flex items-center gap-1.5 text-[11px] font-bold text-indigo-650 dark:text-indigo-400 hover:text-indigo-705 dark:hover:text-indigo-305 transition-colors cursor-pointer"
-                >
-                  {copiedTailwind ? (
-                    <>
-                      <Check className="h-3.5 w-3.5 text-emerald-500" /> Copied!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3.5 w-3.5" /> Copy Utility Class
-                    </>
-                  )}
-                </button>
-              </div>
-
-              <div className="relative mt-2">
-                <pre className="text-[11px] font-mono leading-relaxed bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-300 border border-slate-150 dark:border-slate-850 p-4.5 rounded-2xl overflow-x-auto whitespace-pre-wrap selection:bg-indigo-600/20 shadow-xs max-h-56">
-                  <span className="text-indigo-655 dark:text-indigo-400 font-bold">{generateTailwindValue()}</span>
-                </pre>
-              </div>
-            </div>
-            <p className="text-[10px] text-slate-455/90 leading-relaxed mt-2.5">
-              Apply this custom inline Class value directly to elements styled via Tailwind’s utility class compilation pipeline.
-            </p>
-          </div>
-
+          {/* Print Code segment */}
+          <pre className="text-xs font-mono font-bold text-slate-300 text-left whitespace-pre select-all pt-4 leading-normal max-h-[350px] scrollbar-thin">
+            {activeCodeTab === 'css' && `box-shadow: ${generateShadowStyle()};`}
+            {activeCodeTab === 'tailwind' && generateTailwindValue()}
+            {activeCodeTab === 'react' && generateReactValue()}
+          </pre>
         </div>
+
+        {/* Design info/warning tip */}
+        <div className="flex gap-3 items-start bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-150 dark:border-slate-850 mt-4">
+          <Sparkles className="h-4.5 w-4.5 text-indigo-500 shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <h5 className="text-[11px] font-bold text-slate-800 dark:text-slate-205 uppercase tracking-wider font-display font-medium">Volumetric Shadow Compositing Standard</h5>
+            <p className="text-[10.5px] text-slate-550 dark:text-slate-450 leading-relaxed font-display">
+              Stacking multiple box shadows operates identically to ambient lighting logic. Use standard CSS property tags to guarantee uniform hardware-accelerated viewport rendering on all target web environments.
+            </p>
+          </div>
+        </div>
+
       </div>
 
     </div>

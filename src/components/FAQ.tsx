@@ -342,8 +342,79 @@ export default function FAQ({ activeTab }: FAQProps) {
     }
   ];
 
+  const cubicBezierFaqs: FAQItem[] = [
+    {
+      question: "What is a Cubic Bezier transition easing function?",
+      answer: "A cubic bezier curve is defined by four coordinate control points (P0, P1, P2, P3) that determine the rate of change or temporal velocity interpolation of a CSS transition. This allows you to construct custom accelerations, decelerations, and rubber-band spring bounces that go beyond standard presets like ease-in, ease-out, or linear."
+    },
+    {
+      question: "What are standard control coordinate parameters for elastic or bounce easing curves?",
+      answer: "Elastic spring easing curves use Y-coordinates that exceed the 0.0 to 1.0 boundary box (e.g., cubic-bezier(0.34, 1.56, 0.64, 1)), causing the animated object to overshoot its final target position and spring back into balance, building tactile physical inertia feedback."
+    },
+    {
+      question: "How can I compare custom easing curves side-by-side?",
+      answer: "The Cubic Bezier Generator includes a live comparison suite where you can test your custom curves against standard CSS timing profiles (Ease-In-Out, Linear, Spring Bounce). Watch the visual cards race across different track alignments to observe tension differences."
+    }
+  ];
+
+  const cssLoadersFaqs: FAQItem[] = [
+    {
+      question: "What is the CSS Loaders Generator?",
+      answer: "The CSS Loaders Generator is an interactive visual utility that allows developers to customize, preview, and build pure CSS loaders, spinner ring designs, dots, pulses, progressive bars, and geometric shapes with live, production-ready code."
+    },
+    {
+      question: "Why are pure CSS loaders superior to GIF/video or heavy JS loading representations?",
+      answer: "Pure CSS animations use declarative keyframes that execute directly on the browser's compositor thread using hardware acceleration (e.g. transform: rotate, scale). This keeps animations perfectly smooth (60FPS) even if the primary JS event-loop thread is fully blocked with complex client-side calculations or virtual DOM updates."
+    },
+    {
+      question: "How do I integrate these CSS loaders into my React/Tailwind workspaces?",
+      answer: "You can copy the custom scoped CSS stylesheet blocks with keyframes and add them to your global stylesheet (@import \"tailwindcss\" or index.css), or wrap them in Tailwind @layer utilities. Then, simply copy the custom HTML tree and utilize the corresponding classnames on your target loading elements."
+    },
+    {
+      question: "How can I customize the loader sizing and speed attributes?",
+      answer: "In our styling dashboard, adjust the Sizing Radius, Stroke Line Weight, and duration multipliers. The tool will dynamically re-compile precise CSS variable values, keyframe timing files, and relative dimensions, keeping everything scaling mathematically perfect."
+    }
+  ];
+
+  const filterEffectsFaqs: FAQItem[] = [
+    {
+      question: "What is the CSS Filter Effects Generator?",
+      answer: "The CSS Filter Effects Generator is an interactive visual workbench where developers can coordinate and preview pure CSS image filter parameters including contrast, saturation, blur, brightness, sepia, hue-rotation, and inversion."
+    },
+    {
+      question: "Why should I use standard CSS filters over custom Canvas pixels in browsers?",
+      answer: "Standard CSS filters are fully composited by the GPU, keeping animation rendering perfectly smooth at 60FPS. This avoids heavy JavaScript CPU overhead, blocking main thread loops, or slow, step-by-step canvas context recalculations."
+    },
+    {
+      question: "Is there a limit to stacking multiple filters on a single DOM element?",
+      answer: "No, you can stack any combination and amount of filters on a single element (e.g., filter: saturate(1.5) contrast(1.2) blur(2px)). However, keep in mind they are evaluated in sequence from left to right, which yields distinct visual results compared to other orders."
+    },
+    {
+      question: "How can I integrate these filtered parameters with web images or layouts?",
+      answer: "You can copy our pre-calculated raw CSS style declarations and apply them via standard inline tags or style parameters, or leverage the equivalent Tailwind composition classes (e.g., classes like filter saturate-[150%] grayscale-[30%])."
+    }
+  ];
+
   const getFaqData = () => {
     switch (activeTab) {
+      case 'filter-effects':
+        return {
+          items: filterEffectsFaqs,
+          title: "CSS Filter Effects FAQs",
+          description: "Frequently asked questions about GPU compilation, filter sequence order, Tailwind filter compositions, and performance optimizations."
+        };
+      case 'css-loaders':
+        return {
+          items: cssLoadersFaqs,
+          title: "CSS Loaders & Indicator FAQs",
+          description: "Frequently asked questions about hardware-accelerated animations, performance optimizations, customizing orbital timers, and exporting clean code layers."
+        };
+      case 'cubic-bezier':
+        return {
+          items: cubicBezierFaqs,
+          title: "Cubic Bezier Easing & Curves FAQs",
+          description: "Frequently asked questions about bezier curves, control coordinate parameters, visual velocity scaling, and physical inertia transition properties."
+        };
       case 'transform-playground':
         return {
           items: transformPlaygroundFaqs,

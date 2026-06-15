@@ -1,5 +1,5 @@
 import React from 'react';
-import { Type, Sliders, Grid, Columns, Laptop, BookOpen, Sun, Moon, Menu, X, Sparkles, Heart, Shield, LogIn, ChevronDown, ExternalLink, Box, Droplet, Scissors, Compass, Layers, Maximize, HelpCircle, MousePointer, Move } from 'lucide-react';
+import { Type, Sliders, Grid, Columns, Laptop, BookOpen, Sun, Moon, Menu, X, Sparkles, Heart, Shield, LogIn, ChevronDown, ExternalLink, Box, Droplet, Scissors, Compass, Layers, Maximize, HelpCircle, MousePointer, Move, Activity, Loader, Aperture } from 'lucide-react';
 import { ActiveTab } from '../types';
 
 interface NavbarProps {
@@ -42,6 +42,9 @@ export default function Navbar({
   ];
 
   const effectItems = [
+    { id: 'filter-effects' as ActiveTab, label: 'Filter Effects', icon: Aperture, description: 'Interactive image CSS filter generator. Build custom retro, vintage, noir, cyberpunk, saturation, and contrast parameters.' },
+    { id: 'css-loaders' as ActiveTab, label: 'CSS Loaders', icon: Loader, description: 'Interactive CSS loader indicator generator. Customize sizes, colors, duration speeds, and export cleanly.' },
+    { id: 'cubic-bezier' as ActiveTab, label: 'Cubic Bezier Generator', icon: Activity, description: 'Interactive easing curve designer with side-by-side transition preview comparative speed scales' },
     { id: 'transform-playground' as ActiveTab, label: 'Transform Playground', icon: Move, description: 'Interactive 3D transform tool controlling rotational angles, perspective, axial scales, and transit times' },
     { id: 'background-pattern' as ActiveTab, label: 'Background Pattern', icon: Grid, description: 'Interactive CSS grid, dots, stripes, waves, and geometric background pattern builder with direct CSS export' },
     { id: 'cursor' as ActiveTab, label: 'Custom CSS Cursor', icon: MousePointer, description: 'Creative custom cursor designer with trailing ripples, custom pointers, and hover animation logic' },
@@ -144,13 +147,13 @@ export default function Navbar({
                             setActiveTab(item.id);
                             setFontStylerDropdownOpen(false);
                           }}
-                          className={`w-full flex items-start gap-3 rounded-xl p-2 px-2.5 text-left transition-all cursor-pointer ${
+                          className={`w-full flex items-center gap-3 rounded-xl p-2 px-2.5 text-left transition-all cursor-pointer ${
                             isActive
                               ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white'
                               : 'hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-750 dark:text-slate-300'
                           }`}
                         >
-                          <div className={`mt-0.5 p-1.5 rounded-lg border ${
+                          <div className={`p-1.5 rounded-lg border ${
                             isActive 
                               ? 'border-transparent bg-white/20 text-white' 
                               : 'border-slate-150 dark:border-slate-850 bg-slate-50 dark:bg-slate-900 text-indigo-650 dark:text-indigo-400'
@@ -160,11 +163,6 @@ export default function Navbar({
                           <div className="flex-1 min-w-0">
                             <p className="text-xs font-black leading-normal uppercase tracking-wide font-display">
                               {item.label}
-                            </p>
-                            <p className={`text-[10px] whitespace-normal leading-relaxed mt-0.5 ${
-                              isActive ? 'text-indigo-100' : 'text-slate-450'
-                            }`}>
-                              {item.description}
                             </p>
                           </div>
                         </button>
@@ -189,7 +187,7 @@ export default function Navbar({
                 id="nav-effects-dropdown-btn"
                 onClick={() => {
                   setEffectsDropdownOpen(false);
-                  const effectsTabs = ['effects', 'shadow', 'glass', 'clippath', 'neumorphism', 'backdrop-filter', 'border-radius', 'tooltip', 'cursor', 'background-pattern', 'transform-playground'];
+                  const effectsTabs = ['effects', 'shadow', 'glass', 'clippath', 'neumorphism', 'backdrop-filter', 'border-radius', 'tooltip', 'cursor', 'background-pattern', 'transform-playground', 'cubic-bezier', 'css-loaders', 'filter-effects'];
                   if (!effectsTabs.includes(activeTab)) {
                     setActiveTab('effects');
                   }
@@ -201,7 +199,7 @@ export default function Navbar({
                   }, 100);
                 }}
                 className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold uppercase tracking-wider font-display transition-all duration-150 cursor-pointer ${
-                  ['effects', 'shadow', 'glass', 'clippath', 'neumorphism', 'backdrop-filter', 'border-radius', 'tooltip', 'cursor', 'background-pattern', 'transform-playground'].includes(activeTab)
+                  ['effects', 'shadow', 'glass', 'clippath', 'neumorphism', 'backdrop-filter', 'border-radius', 'tooltip', 'cursor', 'background-pattern', 'transform-playground', 'cubic-bezier', 'css-loaders', 'filter-effects'].includes(activeTab)
                     ? 'bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 border border-transparent'
                     : 'text-slate-650 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100/80 dark:hover:bg-slate-900 border border-transparent'
                 }`}
@@ -226,7 +224,7 @@ export default function Navbar({
                         Visual Effects & Animations
                       </span>
                       <span className="text-[8px] font-mono font-bold bg-indigo-55 dark:bg-indigo-950/40 text-indigo-750 dark:text-indigo-400 px-1.5 py-0.5 rounded">
-                        {extraEffectsLoaded ? "11 of 11 loaded" : "5 of 11 loaded"}
+                        {extraEffectsLoaded ? "14 of 14 loaded" : "5 of 14 loaded"}
                       </span>
                     </div>
                     
@@ -242,13 +240,13 @@ export default function Navbar({
                               setActiveTab(item.id);
                               setEffectsDropdownOpen(false);
                             }}
-                            className={`w-full flex items-start gap-3 rounded-xl p-2.5 text-left transition-all cursor-pointer ${
+                            className={`w-full flex items-center gap-3 rounded-xl p-2.5 text-left transition-all cursor-pointer ${
                               isActive
                                 ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white'
                                 : 'hover:bg-slate-50 dark:hover:bg-slate-900 text-slate-750 dark:text-slate-300'
                             }`}
                           >
-                            <div className={`mt-0.5 p-1.5 rounded-lg border ${
+                            <div className={`p-1.5 rounded-lg border ${
                               isActive 
                                 ? 'border-transparent bg-white/20 text-white' 
                                 : 'border-slate-150 dark:border-slate-850 bg-slate-50 dark:bg-slate-900 text-indigo-650 dark:text-indigo-400'
@@ -258,11 +256,6 @@ export default function Navbar({
                             <div className="flex-1 min-w-0">
                               <p className="text-xs font-bold leading-normal uppercase tracking-wide font-display">
                                 {item.label}
-                              </p>
-                              <p className={`text-[10px] whitespace-normal leading-relaxed mt-0.5 ${
-                                isActive ? 'text-indigo-100' : 'text-slate-450'
-                              }`}>
-                                {item.description}
                               </p>
                             </div>
                           </button>
@@ -290,12 +283,12 @@ export default function Navbar({
                           </span>
                         ) : extraEffectsLoaded ? (
                           <span className="text-emerald-600 dark:text-emerald-450 text-center w-full block font-bold">
-                            ✓ All 11 custom filters optimized!
+                            ✓ All 14 custom filters optimized!
                           </span>
                         ) : (
                           <>
                             <span>Load More Effects ↓</span>
-                            <span className="text-[9px] font-mono normal-case bg-indigo-600 text-white px-2 py-0.5 rounded">6 remaining</span>
+                            <span className="text-[9px] font-mono normal-case bg-indigo-600 text-white px-2 py-0.5 rounded">9 remaining</span>
                           </>
                         )}
                       </button>

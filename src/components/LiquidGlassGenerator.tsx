@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { 
   Sparkles, Copy, Check, Sliders, Palette, Code, RefreshCw, 
-  Eye, Droplet, Wand2, Info, Moon, Sun, ArrowRight, HelpCircle
+  Eye, Droplet, Wand2, Info, Moon, Sun, ArrowRight, HelpCircle,
+  Box, BadgeInfo
 } from 'lucide-react';
 
 interface GlassPreset {
@@ -160,9 +161,9 @@ export default function LiquidGlassGenerator() {
   const [animateBlobs, setAnimateBlobs] = useState<boolean>(true);
   const [activeTab, setActiveTab2] = useState<'preview' | 'code'>('preview');
 
-  // Copy feedbacks
-  const [copiedCSS, setCopiedCSS] = useState<boolean>(false);
-  const [copiedTailwind, setCopiedTailwind] = useState<boolean>(false);
+  // Exporters statuses
+  const [activeCodeTab, setActiveCodeTab] = useState<'css' | 'tailwind' | 'react'>('css');
+  const [copiedText, setCopiedText] = useState<string | null>(null);
 
   const applyPreset = (presetKey: string) => {
     const p = PRESETS[presetKey];
@@ -257,52 +258,35 @@ export default function LiquidGlassGenerator() {
     return output;
   };
 
-  const copyToClipboard = (text: string, type: 'css' | 'tailwind') => {
+  const generateReactCode = () => {
+    const bgRgba = getHexToRgba(tintColor, tintOpacity);
+    const borderRgba = getHexToRgba(borderColor, borderOpacity);
+    return `const glassStyle = {
+  backgroundColor: '${bgRgba}',
+  backdropFilter: 'blur(${blur}px) saturate(${saturate}%)',
+  WebkitBackdropFilter: 'blur(${blur}px) saturate(${saturate}%)',
+  borderRadius: '${borderRadius}px',
+  border: '${borderWidth}px solid ${borderRgba}',
+  boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.35)',
+  position: 'relative',
+  overflow: 'hidden'
+};
+
+// Render in JSX
+<div style={glassStyle}>
+  {/* Content */}
+</div>`;
+  };
+
+  const copyToClipboard = (text: string, format: 'css' | 'tailwind' | 'react') => {
     navigator.clipboard.writeText(text);
-    if (type === 'css') {
-      setCopiedCSS(true);
-      setTimeout(() => setCopiedCSS(false), 2000);
-    } else {
-      setCopiedTailwind(true);
-      setTimeout(() => setCopiedTailwind(false), 2000);
-    }
+    setCopiedText(format);
+    setTimeout(() => setCopiedText(null), 2000);
   };
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto px-4 py-6 sm:py-10 animate-fade-in" id="liquid-glass-workspace">
+    <div className="animate-fade-in relative space-y-8" id="liquid-glass-workspace">
       
-      {/* HEADER SECTION */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-150 dark:border-slate-800 pb-6">
-        <div>
-          <div className="flex items-center gap-2 text-indigo-650 dark:text-indigo-400 font-display font-black text-xs uppercase tracking-widest mb-1.5">
-            <Sparkles className="h-4 w-4 animate-pulse" /> Advanced Visual Studio
-          </div>
-          <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white uppercase font-display sm:text-4xl">
-            Liquid Glass Designer
-          </h1>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 font-display font-medium uppercase tracking-wider">
-            Sleek Glassmorphism Engine Trapped Over Live Fluid WebGL-Style Motion Blobs
-          </p>
-        </div>
-        
-        {/* Preset quick buttons */}
-        <div className="flex flex-wrap gap-2">
-          {Object.entries(PRESETS).map(([key, preset]) => (
-            <button
-              key={key}
-              onClick={() => applyPreset(key)}
-              className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-wider font-display rounded-lg transition-all duration-150 cursor-pointer ${
-                activePreset === key
-                  ? 'bg-indigo-650 dark:bg-indigo-500 text-white shadow-sm'
-                  : 'bg-slate-100 dark:bg-slate-900 text-slate-650 dark:text-slate-400 border border-slate-200 dark:border-slate-800 hover:bg-slate-150 dark:hover:bg-slate-800'
-              }`}
-            >
-              {preset.name.split(' ').slice(-1)[0]}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* CORE 12 COLUMN WORKPSPACE */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
@@ -909,90 +893,86 @@ export default function LiquidGlassGenerator() {
 
       </div>
 
-      {/* NEW FULL WIDTH 12-COLUMN EXPORTER SECTION */}
-      <div className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs space-y-6 animate-fade-in" id="liquid-glass-exporter">
-        <div className="flex items-center justify-between border-b border-slate-150 dark:border-slate-800 pb-3">
-          <div>
-            <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-2 font-display">
-              <Code className="h-4.5 w-4.5 text-indigo-500 animate-pulse" /> Export Liquid Glass Specifications
-            </h3>
-            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-display font-medium uppercase tracking-wider mt-0.5">
-              Deploy lightweight, high-performance glassmorphism layers directly into your web applications
-            </p>
+      {/* CODE COMPILER EXPORT COMPONENT - 12 Column full-width section below grid, above Explore Other Generators */}
+      <div className="bg-white dark:bg-slate-950 border-2 border-slate-150 dark:border-slate-850 rounded-3xl p-6 shadow-sm">
+        
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 border-b border-slate-100 dark:border-slate-850 pb-3">
+          <div className="flex items-center gap-2">
+            <Box className="h-4.5 w-4.5 text-indigo-500" />
+            <div>
+              <h3 className="text-md font-black uppercase tracking-wider font-display text-slate-800 dark:text-white">
+                Export Liquid Glass Styles
+              </h3>
+              <p className="text-[10px] text-slate-450 uppercase tracking-widest font-mono">
+                Deploy lightweight, high-performance glassmorphism layers directly into your web applications
+              </p>
+            </div>
+          </div>
+
+          <div className="flex rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-150 dark:border-slate-850 p-1">
+            {[
+              { id: 'css', label: 'css' },
+              { id: 'tailwind', label: 'tailwind' },
+              { id: 'react', label: 'react / jsx' }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveCodeTab(tab.id as 'css' | 'tailwind' | 'react')}
+                className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider font-display rounded-lg transition-all cursor-pointer ${
+                  activeCodeTab === tab.id
+                    ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-755'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* 1 Row, 2 Column Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Compiled code block */}
+        <div className="relative rounded-2xl bg-slate-950 p-5 mt-4 min-h-[140px] border border-slate-850 overflow-x-auto">
           
-          {/* Column 1: Standard CSS Properties */}
-          <div className="space-y-2 font-mono flex flex-col justify-between">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-wider text-slate-550 dark:text-slate-400 font-display">
-                <span className="flex items-center gap-1.5"><Sliders className="h-3.5 w-3.5 text-indigo-500" /> 1. Standard CSS Properties</span>
-                <button
-                  type="button"
-                  onClick={() => copyToClipboard(generateCSSCode(), 'css')}
-                  className="flex items-center gap-1 font-bold text-indigo-650 dark:text-indigo-450 hover:text-indigo-750 dark:hover:text-indigo-350 transition-colors cursor-pointer"
-                >
-                  {copiedCSS ? (
-                    <>
-                      <Check className="h-3 w-3 text-emerald-500" /> Copied!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3 w-3" /> Copy CSS Rules
-                    </>
-                  )}
-                </button>
-              </div>
-              
-              <div className="relative flex-1">
-                <pre className="text-[10.5px] font-mono leading-relaxed bg-slate-950 text-slate-200 border border-slate-900 p-4 rounded-xl overflow-x-auto whitespace-pre selection:bg-indigo-600/40 h-48">
-                  {generateCSSCode()}
-                </pre>
-              </div>
-            </div>
-          </div>
+          {/* Copy keyboard */}
+          <button
+            onClick={() => {
+              const targetCode = activeCodeTab === 'css' 
+                ? generateCSSCode()
+                : activeCodeTab === 'tailwind' 
+                ? generateTailwindCode() 
+                : generateReactCode();
+              copyToClipboard(targetCode, activeCodeTab);
+            }}
+            className="absolute top-4 right-4 p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 hover:border-slate-700 text-slate-355 cursor-pointer transition-all z-10 flex items-center gap-1.5"
+          >
+            {copiedText === activeCodeTab ? (
+              <>
+                <Check className="h-4.5 w-4.5 text-emerald-500" />
+                <span className="text-[10px] font-black uppercase text-emerald-500 font-display">Copied!</span>
+              </>
+            ) : (
+              <>
+                <Copy className="h-4.5 w-4.5 text-indigo-400" />
+                <span className="text-[10px] font-black uppercase font-display text-slate-300">Copy Code</span>
+              </>
+            )}
+          </button>
 
-          {/* Column 2: Tailwind CSS Arbitrary Classes */}
-          <div className="space-y-2 font-mono flex flex-col justify-between">
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-wider text-slate-550 dark:text-slate-400 font-display">
-                <span className="flex items-center gap-1.5"><Sparkles className="h-3.5 w-3.5 text-indigo-500" /> 2. Tailwind CSS Arbitrary Utility Classes</span>
-                <button
-                  type="button"
-                  onClick={() => copyToClipboard(generateTailwindCode(), 'tailwind')}
-                  className="flex items-center gap-1 font-bold text-indigo-650 dark:text-indigo-400 hover:text-indigo-705 dark:hover:text-indigo-305 transition-colors cursor-pointer"
-                >
-                  {copiedTailwind ? (
-                    <>
-                      <Check className="h-3 w-3 text-emerald-500" /> Copied!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3 w-3" /> Copy Utility String
-                    </>
-                  )}
-                </button>
-              </div>
-              
-              <div className="relative flex-1">
-                <pre className="text-[10.5px] font-mono leading-relaxed bg-slate-50 dark:bg-slate-950 text-slate-700 dark:text-slate-305 border border-slate-150 dark:border-slate-850 p-4 rounded-xl overflow-x-auto whitespace-normal break-all selection:bg-indigo-600/20 h-48 flex items-center">
-                  <span className="text-indigo-650 dark:text-indigo-400 font-bold leading-normal">{generateTailwindCode()}</span>
-                </pre>
-              </div>
-            </div>
-          </div>
+          {/* Print Code segment */}
+          <pre className="text-xs font-mono font-bold text-slate-350 text-left whitespace-pre select-all pt-4 leading-normal">
+            {activeCodeTab === 'css' && generateCSSCode()}
+            {activeCodeTab === 'tailwind' && generateTailwindCode()}
+            {activeCodeTab === 'react' && generateReactCode()}
+          </pre>
 
         </div>
 
-        {/* Tip & Warning Footer */}
-        <div className="flex gap-3 items-start bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-150 dark:border-slate-850">
-          <Info className="h-4.5 w-4.5 text-indigo-500 shrink-0 mt-0.5" />
-          <div className="space-y-1">
-            <h5 className="text-[11px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider font-display">Aesthetic Implementation Guideline</h5>
-            <p className="text-[10.5px] text-slate-550 dark:text-slate-400 leading-relaxed font-display">
+        {/* Informational helpful tips */}
+        <div className="mt-4 p-4 rounded-2xl bg-indigo-50/50 dark:bg-slate-900/40 border border-indigo-100/50 dark:border-slate-850 text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed flex gap-3">
+          <BadgeInfo className="h-5 w-5 text-indigo-500 shrink-0 mt-0.5" />
+          <div>
+            <p className="font-bold text-slate-850 dark:text-slate-300 mb-0.5">Aesthetic Implementation Guideline</p>
+            <p>
               To achieve authentic Liquid Glass aesthetics in your designs, ensure parent containers possess dynamic vibrant background gradients or floating graphic panels. The translucent frosted plate relies on high backdrop-blur vectors to isolate foreground typography layers.
             </p>
           </div>

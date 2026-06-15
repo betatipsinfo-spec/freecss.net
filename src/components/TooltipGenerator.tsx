@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   Sparkles, RotateCcw, Sliders, Layers, Code, Palette, HelpCircle, 
   Copy, Check, Eye, HelpCircle as HelpIcon, ArrowUp, ArrowDown, ArrowLeft, ArrowRight,
-  Maximize, Settings, Zap, Play
+  Maximize, Settings, Zap, Play, Box
 } from 'lucide-react';
 
 interface TooltipPreset {
@@ -168,8 +168,16 @@ export default function TooltipGenerator() {
   const [activePresetIndex, setActivePresetIndex] = useState<number>(0);
   const [forceShow, setForceShow] = useState<boolean>(true);
   const [copiedCSS, setCopiedCSS] = useState<boolean>(false);
-  const [copiedHTML, setCopiedHTML] = useState<boolean>(false);
+  const [copiedTailwind, setCopiedTailwind] = useState<boolean>(false);
   const [copiedReact, setCopiedReact] = useState<boolean>(false);
+  const [activeCodeTab, setActiveCodeTab] = useState<'css' | 'tailwind' | 'react'>('css');
+  const [copiedText, setCopiedText] = useState<'css' | 'tailwind' | 'react' | null>(null);
+
+  const handleCopyToClipboard = (text: string, tab: 'css' | 'tailwind' | 'react') => {
+    navigator.clipboard.writeText(text);
+    setCopiedText(tab);
+    setTimeout(() => setCopiedText(null), 2000);
+  };
 
   // Apply a config preset instantly
   const applyPreset = (index: number) => {
@@ -339,15 +347,67 @@ export default function TooltipGenerator() {
   transform: ${anim.hoverTransform};
 }`;
 
-  const rawHTMLCode = `<div class="tooltip-container">
-  <button class="trigger-btn">${triggerText}</button>
-  <div class="tooltip-bubble">
+  // Dynamic highly-precision Tailwind CSS utility compiler
+  const getTailwindCode = () => {
+    let placementClass = '';
+    let arrowPlacementStyle = '';
+    let animClassesStart = '';
+    let animClassesEnd = '';
+
+    switch (position) {
+      case 'top':
+        placementClass = 'bottom-full left-1/2 -translate-x-1/2 mb-[10px]';
+        arrowPlacementStyle = `bottom-[-${arrowSize * 2}px] left-1/2 -translate-x-1/2 border-[${arrowSize}px] border-t-[${bgColor}] border-x-transparent border-b-transparent`;
+        animClassesStart = 'translate-y-2';
+        animClassesEnd = 'group-hover:translate-y-0';
+        break;
+      case 'bottom':
+        placementClass = 'top-full left-1/2 -translate-x-1/2 mt-[10px]';
+        arrowPlacementStyle = `top-[-${arrowSize * 2}px] left-1/2 -translate-x-1/2 border-[${arrowSize}px] border-b-[${bgColor}] border-x-transparent border-t-transparent`;
+        animClassesStart = '-translate-y-2';
+        animClassesEnd = 'group-hover:translate-y-0';
+        break;
+      case 'left':
+        placementClass = 'right-full top-1/2 -translate-y-1/2 mr-[10px]';
+        arrowPlacementStyle = `right-[-${arrowSize * 2}px] top-1/2 -translate-y-1/2 border-[${arrowSize}px] border-l-[${bgColor}] border-y-transparent border-r-transparent`;
+        animClassesStart = 'translate-x-2';
+        animClassesEnd = 'group-hover:translate-x-0';
+        break;
+      case 'right':
+        placementClass = 'left-full top-1/2 -translate-y-1/2 ml-[10px]';
+        arrowPlacementStyle = `left-[-${arrowSize * 2}px] top-1/2 -translate-y-1/2 border-[${arrowSize}px] border-r-[${bgColor}] border-y-transparent border-l-transparent`;
+        animClassesStart = '-translate-x-2';
+        animClassesEnd = 'group-hover:translate-x-0';
+        break;
+    }
+
+    let animationScale = '';
+    if (animation === 'scale') {
+      animationScale = 'scale-90 group-hover:scale-100';
+    } else if (animation === 'zoom-in') {
+      animationScale = 'scale-50 group-hover:scale-100';
+    } else if (animation === 'bounce') {
+      animationScale = 'scale-95 group-hover:scale-105';
+    }
+
+    return `<div className="relative inline-block group">
+  <button className="px-5 py-2.5 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition duration-200">
+    ${triggerText}
+  </button>
+  
+  {/* Tooltip Bubble */}
+  <div className="absolute ${placementClass} z-50 px-[${paddingX}px] py-[${paddingY}px] bg-[${bgColor}] text-[${textColor}] text-[${fontSize}px] font-${fontWeight === 'normal' ? 'normal' : fontWeight === 'semibold' ? 'semibold' : 'bold'} rounded-[${borderRadius}px] shadow-lg pointer-events-none opacity-0 group-hover:opacity-100 transition-all duration-[${transitionTime}ms] ease-out ${animClassesStart} ${animClassesEnd} ${animationScale} ${borderWidth > 0 ? `border-[${borderWidth}px] border-[${borderColor}]` : ''} ${hasGlow ? `shadow-[0_0_15px_${bgColor}]` : ''}">
     ${tooltipContent}
+    {/* Tooltip Arrow */}
+    <div className="absolute w-0 h-0 border-solid ${arrowPlacementStyle}"></div>
   </div>
 </div>`;
+  };
+
+  const rawTailwindCode = getTailwindCode();
 
   const rawReactCode = `import React from 'react';
-
+ 
 export default function SmartTooltip() {
   return (
     <div className="relative inline-block group">
@@ -392,54 +452,26 @@ export default function SmartTooltip() {
   );
 }`;
 
-  const copyToClipboard = (text: string, format: 'css' | 'html' | 'react') => {
-    navigator.clipboard.writeText(text);
-    if (format === 'css') {
-      setCopiedCSS(true);
-      setTimeout(() => setCopiedCSS(false), 2000);
-    } else if (format === 'html') {
-      setCopiedHTML(true);
-      setTimeout(() => setCopiedHTML(false), 2000);
-    } else {
-      setCopiedReact(true);
-      setTimeout(() => setCopiedReact(false), 2000);
-    }
-  };
-
   return (
-    <div className="space-y-8 max-w-7xl mx-auto px-4 py-6 sm:py-10 animate-fade-in" id="tooltip-generator-workspace">
+    <div className="space-y-6 animate-fade-in" id="tooltip-generator-workspace">
       
-      {/* HEADER UNIT */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-150 dark:border-slate-800 pb-6 animate-fade-in">
-        <div>
-          <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-display font-black text-xs uppercase tracking-widest mb-1.5 animate-pulse">
-            <Sparkles className="h-4 w-4" /> Custom UI Micro-components
-          </div>
-          <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white uppercase font-display sm:text-4xl">
-            CSS Tooltip Generator
-          </h1>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 font-display font-medium uppercase tracking-wider">
-            Synthesize spectacular, lightweight purely responsive CSS popovers, directional pointers, and smooth overlays
-          </p>
-        </div>
-
-        <button
-          onClick={handleReset}
-          className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-black uppercase tracking-wider font-display rounded-xl border border-slate-205 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-655 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 cursor-pointer self-start md:self-center transition-all shadow-2xs"
-        >
-          <RotateCcw className="h-3.5 w-3.5" /> Reset Playground
-        </button>
-      </div>
-
       {/* QUICK PRESETS CAROUSEL */}
       <div className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-xs font-black uppercase tracking-wider text-slate-450 dark:text-slate-550 flex items-center gap-2 font-display">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <h3 className="text-xs font-black uppercase tracking-wider text-slate-855 dark:text-slate-200 flex items-center gap-2 font-display">
             <Palette className="h-4 w-4 text-indigo-500" /> Beautiful Ready-to-use Tooltip Presets
           </h3>
-          <span className="text-[9px] font-mono bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 font-extrabold uppercase px-2 py-0.5 rounded-full">
-            Modern custom palettes
-          </span>
+          <div className="flex items-center gap-3 self-end sm:self-center">
+            <button
+              onClick={handleReset}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-black uppercase tracking-wider font-display rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-700 dark:text-slate-350 hover:bg-slate-50 dark:hover:bg-slate-900 cursor-pointer transition-all shadow-xs active:scale-95"
+            >
+              <RotateCcw className="h-3.5 w-3.5 text-indigo-500 animate-spin-reverse-once" /> Reset Playground
+            </button>
+            <span className="text-[9px] font-mono bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 font-extrabold uppercase px-2 py-1 rounded-full">
+              Modern custom palettes
+            </span>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
@@ -771,8 +803,8 @@ export default function SmartTooltip() {
 
         </div>
 
-        {/* DISPLAY PREVIEW AREA (5 columns) */}
-        <div className="lg:col-span-5 space-y-6">
+        {/* RIGHT COLUMN: PREVIEW STAGE & CODE EXPORTERS */}
+        <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-24">
 
           {/* DYNAMIC BUBBLE CANVAS */}
           <div className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm flex flex-col justify-between overflow-hidden relative">
@@ -909,126 +941,85 @@ export default function SmartTooltip() {
 
       </div>
 
-      {/* EXPORT CODE BLOCKS (Standard structure matching BorderRadius) */}
-      <div className="bg-white dark:bg-slate-900 border-2 border-slate-205 dark:border-slate-800 rounded-2xl p-6 shadow-xs space-y-6 font-display animate-fade-in">
+      {/* EXPORT CODE BLOCKS (Styled similarly to Transform Playground) */}
+      <div className="mt-8 bg-white dark:bg-slate-950 border-2 border-slate-150 dark:border-slate-850 rounded-3xl p-6 shadow-sm">
         
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-150 dark:border-slate-850 pb-4">
-          <div>
-            <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-2 font-display">
-              <Code className="h-5 w-5 text-indigo-500" /> Export System Code Block
+        <div className="flex items-center justify-between mb-4 border-b border-slate-100 dark:border-slate-850 pb-3">
+          <div className="flex items-center gap-2">
+            <Box className="h-4.5 w-4.5 text-indigo-500" />
+            <h3 className="text-md font-black uppercase tracking-wider font-display text-slate-800 dark:text-white">
+              Export Tooltip Styles
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
-              Select and copy beautiful, semantic code snippets optimized for low-footprint browser compilation
-            </p>
           </div>
-          <span className="self-start sm:self-center text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-55/65 dark:bg-emerald-950/40 border border-emerald-250/50 px-3 py-1 rounded-xl uppercase tracking-wider animate-pulse flex items-center gap-1">
-            <Zap className="h-3 w-3" /> Live Synced
-          </span>
+
+          <div className="flex rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-150 dark:border-slate-850 p-1">
+            {(['css', 'tailwind', 'react'] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveCodeTab(tab)}
+                className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider font-display rounded-lg transition-all cursor-pointer ${
+                  activeCodeTab === tab
+                    ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-750'
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Compiled code block */}
+        <div className="relative rounded-2xl bg-slate-950 p-5 mt-4 min-h-[140px] border border-slate-850 overflow-x-auto">
           
-          {/* EXPORTER A: STANDARD HTML/CSS */}
-          <div className="space-y-3 flex flex-col justify-between h-full bg-slate-50/50 dark:bg-slate-950/30 p-4.5 rounded-xl border border-slate-150 dark:border-slate-850">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-wider text-slate-655 dark:text-slate-350">
-                <span>1. RAW CSS3 STYLESHEET</span>
-                <button
-                  onClick={() => copyToClipboard(rawCSSCode, 'css')}
-                  className="px-2.5 py-1 rounded-lg text-[10px] font-bold text-indigo-650 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 hover:bg-indigo-105 duration-150 flex items-center gap-1 cursor-pointer font-display"
-                >
-                  {copiedCSS ? (
-                    <>
-                      <Check className="h-3 w-3 text-emerald-500" /> COPIED!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3 w-3" /> COPY CSS
-                    </>
-                  )}
-                </button>
-              </div>
+          {/* Copy keyboard */}
+          <button
+            onClick={() => {
+              const targetCode = activeCodeTab === 'css' 
+                ? rawCSSCode 
+                : activeCodeTab === 'tailwind' 
+                ? rawTailwindCode 
+                : rawReactCode;
+              handleCopyToClipboard(targetCode, activeCodeTab);
+            }}
+            className="absolute top-4 right-4 p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 hover:border-slate-700 text-slate-350 cursor-pointer transition-all z-10 flex items-center gap-1.5"
+          >
+            {copiedText === activeCodeTab ? (
+              <>
+                <Check className="h-4.5 w-4.5 text-emerald-500" />
+                <span className="text-[10px] font-black uppercase text-emerald-500 font-display">Copied!</span>
+              </>
+            ) : (
+              <>
+                <Copy className="h-4.5 w-4.5 text-indigo-400" />
+                <span className="text-[10px] font-black uppercase font-display text-slate-300">Copy Code</span>
+              </>
+            )}
+          </button>
 
-              <div className="p-3.5 bg-slate-950 rounded-xl border border-slate-850 font-mono text-[11px] leading-relaxed text-indigo-400 overflow-y-auto select-all whitespace-pre h-[180px] flex items-start justify-start scrollbar-thin">
-                <code className="w-full text-left block">{rawCSSCode}</code>
-              </div>
-            </div>
-          </div>
-
-          {/* EXPORTER B: SEMANTIC MARKUP */}
-          <div className="space-y-3 flex flex-col justify-between h-full bg-slate-50/50 dark:bg-slate-950/30 p-4.5 rounded-xl border border-slate-150 dark:border-slate-850">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-wider text-slate-655 dark:text-slate-350">
-                <span>2. SEMANTIC HTML MARKUP</span>
-                <button
-                  onClick={() => copyToClipboard(rawHTMLCode, 'html')}
-                  className="px-2.5 py-1 rounded-lg text-[10px] font-bold text-indigo-650 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 hover:bg-indigo-105 duration-150 flex items-center gap-1 cursor-pointer font-display"
-                >
-                  {copiedHTML ? (
-                    <>
-                      <Check className="h-3 w-3 text-emerald-500" /> COPIED!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3 w-3" /> COPY HTML
-                    </>
-                  )}
-                </button>
-              </div>
-
-              <div className="p-3.5 bg-slate-950 rounded-xl border border-slate-850 font-mono text-[11px] leading-relaxed text-purple-200 overflow-y-auto select-all whitespace-pre h-[180px] flex items-start justify-start scrollbar-thin">
-                <code className="w-full text-left block">{rawHTMLCode}</code>
-              </div>
-            </div>
-          </div>
-
-          {/* EXPORTER C: REACT MARKUP WITH STYLING */}
-          <div className="space-y-3 flex flex-col justify-between h-full bg-slate-50/50 dark:bg-slate-955/30 p-4.5 rounded-xl border border-slate-150 dark:border-slate-850">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-wider text-slate-655 dark:text-slate-350">
-                <span>3. REACT COMPONENT SYSTEM</span>
-                <button
-                  onClick={() => copyToClipboard(rawReactCode, 'react')}
-                  className="px-2.5 py-1 rounded-lg text-[10px] font-bold text-indigo-655 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 hover:bg-indigo-105 duration-150 flex items-center gap-1 cursor-pointer font-display"
-                >
-                  {copiedReact ? (
-                    <>
-                      <Check className="h-3 w-3 text-emerald-500" /> COPIED!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3 w-3" /> COPY REACT
-                    </>
-                  )}
-                </button>
-              </div>
-
-              <div className="p-3.5 bg-slate-955 rounded-xl border border-slate-850 font-mono text-[11px] leading-relaxed text-blue-200 overflow-y-auto select-all whitespace-pre h-[180px] flex items-start justify-start scrollbar-thin">
-                <code className="w-full text-left block">{rawReactCode}</code>
-              </div>
-            </div>
-          </div>
+          {/* Print Code segment */}
+          <pre className="text-xs font-mono font-bold text-slate-350 text-left whitespace-pre select-all pt-4 leading-normal">
+            {activeCodeTab === 'css' && rawCSSCode}
+            {activeCodeTab === 'tailwind' && rawTailwindCode}
+            {activeCodeTab === 'react' && rawReactCode}
+          </pre>
 
         </div>
 
-      </div>
-
-      {/* REACTION COMPACT INSTRUCTION CARD */}
-      <div className="bg-slate-50 dark:bg-slate-955 rounded-2xl border-2 border-slate-205 dark:border-slate-850 p-6 flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="flex items-center gap-5 text-left">
-          <div className="bg-indigo-50 dark:bg-indigo-950 p-3 rounded-xl border border-indigo-200 dark:border-indigo-900">
-            <NormalizeIcon className="h-6 w-6 text-indigo-650 dark:text-indigo-450" />
-          </div>
+        {/* Informational helpful tips */}
+        <div className="mt-4 p-4 rounded-2xl bg-indigo-50/50 dark:bg-slate-900/40 border border-indigo-100/50 dark:border-slate-850 text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed flex gap-3">
+          <Settings className="h-5 w-5 text-indigo-500 shrink-0 mt-0.5" />
           <div>
-            <h4 className="text-xs uppercase font-black tracking-wider text-slate-850 dark:text-white">
-              Slick directional tooltips built clean and accessible
-            </h4>
-            <p className="text-[11px] leading-relaxed text-slate-550 dark:text-slate-400 max-w-2xl">
-              Using absolute directional indices in combination with state variables, our tooltip generator avoids nested dependency glitches. Utilizing transparent border angles, we construct pointer triangles cleanly without relying on high footprint graphical structures, keeping response sizes minimal and completely reactive.
+            <p className="font-bold text-slate-850 dark:text-slate-300 mb-0.5">Custom Tooltip Compositing tip</p>
+            <p>
+              Using CSS transparency and responsive offsets ensures layout-independent rendering. Ensure your parent element has <code>position: relative</code> so the tooltips align correctly to their trigger bounds.
             </p>
           </div>
         </div>
+
       </div>
+
+     
 
     </div>
   );

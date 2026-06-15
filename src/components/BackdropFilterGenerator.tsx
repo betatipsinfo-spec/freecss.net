@@ -110,6 +110,7 @@ export default function BackdropFilterGenerator() {
   const [copiedCSS, setCopiedCSS] = useState<boolean>(false);
   const [copiedTailwind, setCopiedTailwind] = useState<boolean>(false);
   const [copiedReact, setCopiedReact] = useState<boolean>(false);
+  const [activeCodeTab, setActiveCodeTab] = useState<'css' | 'tailwind' | 'react'>('css');
 
   // Hex color to RGBA helper
   const hexToRgba = (hex: string, alpha: number): string => {
@@ -237,39 +238,29 @@ backdrop-filter: ${currentFilterString};
   };
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto px-4 py-6 sm:py-10 animate-fade-in" id="backdrop-filter-workspace">
+    <div className="space-y-8 animate-fade-in" id="backdrop-filter-workspace">
       
-      {/* HEADER UNIT */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-150 dark:border-slate-800 pb-6 animate-fade-in">
-        <div>
-          <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-display font-black text-xs uppercase tracking-widest mb-1.5 animate-pulse">
-            <Sparkles className="h-4 w-4" /> modern glassmorphism engine
-          </div>
-          <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white uppercase font-display sm:text-4xl">
-            Backdrop Filter CSS Playground
-          </h1>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 font-display font-medium uppercase tracking-wider">
-            Stunning real-time backdrop-filter customizer featuring vivid sub-layers, high transparency parameters, and tactile glass presets
-          </p>
-        </div>
-
-        <button
-          onClick={handleReset}
-          className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-black uppercase tracking-wider font-display rounded-xl border border-slate-205 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-650 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 cursor-pointer self-start md:self-center transition-all shadow-2xs"
-        >
-          <RotateCcw className="h-3.5 w-3.5" /> Reset Playground
-        </button>
-      </div>
-
       {/* QUICK PRESETS CAROUSEL */}
-      <div className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-xs font-black uppercase tracking-wider text-slate-450 dark:text-slate-500 flex items-center gap-2 font-display">
-            <Palette className="h-4 w-4 text-indigo-500" /> Tactical Glass Presets
-          </h3>
-          <span className="text-[9px] font-mono bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 font-extrabold uppercase px-2 py-0.5 rounded-full">
-            Dynamic overlay values
-          </span>
+      <div className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
+          <div className="flex items-center gap-2">
+            <Palette className="h-4.5 w-4.5 text-indigo-500" />
+            <div>
+              <h3 className="text-sm font-black uppercase tracking-wider text-slate-800 dark:text-slate-205 font-display">
+                Tactical Glass Presets
+              </h3>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider font-display font-medium mt-0.5">
+                Switch category and load sample backdrop filter parameters
+              </p>
+            </div>
+          </div>
+          
+          <button
+            onClick={handleReset}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-[10px] text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 hover:bg-slate-55 dark:hover:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-black uppercase tracking-wider transition-all duration-150 cursor-pointer self-start sm:self-auto"
+          >
+            <RotateCcw className="h-3 w-3" /> Reset Playground
+          </button>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-3">
@@ -757,106 +748,72 @@ backdrop-filter: ${currentFilterString};
 
       </div>
 
-      {/* FULL-WIDTH REAL TIME EXPORT PANEL (12 Column) */}
-      <div className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs space-y-6 font-display animate-fade-in">
+      {/* CODE EXPORTER PANEL - Full Width 12-column Section */}
+      <div className="bg-white dark:bg-slate-955 border-2 border-slate-205 dark:border-slate-800 rounded-3xl p-6 shadow-sm overflow-hidden animate-fade-in mt-8" id="backdrop-exporter">
         
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-150 dark:border-slate-800 pb-4">
-          <div>
-            <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-2 font-display">
-              <Code className="h-5 w-5 text-indigo-500" /> Real-time Export Panel
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-5 pb-3 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex items-center gap-2">
+            <Code className="h-4.5 w-4.5 text-indigo-500" />
+            <h3 className="text-md font-black uppercase tracking-wider font-display text-slate-800 dark:text-white">
+              Real-time Export Panel
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
-              Copy generated Backdrop Filter parameters instantly in your preferred structure
-            </p>
           </div>
-          <span className="self-start sm:self-center text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-55/60 dark:bg-emerald-950/40 border border-emerald-200/50 dark:border-emerald-990/55 px-3 py-1 rounded-xl uppercase tracking-wider animate-pulse flex items-center gap-1">
-            <Sparkles className="h-3 w-3 animate-spin" /> Live Synced
-          </span>
+
+          {/* Code format toggle buttons */}
+          <div className="flex rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1">
+            {[
+              { id: 'css', label: 'Standard CSS' },
+              { id: 'tailwind', label: 'Tailwind CSS' },
+              { id: 'react', label: 'React Inline' }
+            ].map((recipeTab) => (
+              <button
+                key={recipeTab.id}
+                onClick={() => setActiveCodeTab(recipeTab.id as any)}
+                className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider font-display rounded-lg transition-all cursor-pointer ${
+                  activeCodeTab === recipeTab.id
+                    ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                }`}
+              >
+                {recipeTab.label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Code presentation stage */}
+        <div className="relative rounded-2xl bg-slate-950 p-5 mt-4 min-h-[140px] border border-slate-800 overflow-x-auto animate-fade-in animate-duration-150">
           
-          {/* RAW CSS BOX */}
-          <div className="space-y-3 flex flex-col justify-between h-full bg-slate-50/50 dark:bg-slate-950/30 p-4.5 rounded-xl border border-slate-150 dark:border-slate-850">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-wider text-slate-650 dark:text-slate-350">
-                <span>1. Standard CSS3 Declarations</span>
-                <button
-                  onClick={() => copyToClipboard(cssCode, 'css')}
-                  className="px-2.5 py-1 rounded-lg text-[10px] font-bold text-indigo-650 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 hover:bg-indigo-105 duration-150 flex items-center gap-1 cursor-pointer font-display"
-                >
-                  {copiedCSS ? (
-                    <>
-                      <Check className="h-3 w-3 text-emerald-500" /> COPIED!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3 w-3" /> COPY CSS
-                    </>
-                  )}
-                </button>
-              </div>
+          {/* Float Copy Button */}
+          <button
+            onClick={() => {
+              let textToCopy = '';
+              if (activeCodeTab === 'css') textToCopy = cssCode;
+              if (activeCodeTab === 'tailwind') textToCopy = getTailwindCode();
+              if (activeCodeTab === 'react') textToCopy = reactCode;
+              copyToClipboard(textToCopy, activeCodeTab);
+            }}
+            className="absolute top-4 right-4 p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 hover:border-slate-700 text-slate-400 cursor-pointer transition-all z-10 flex items-center gap-1.5"
+          >
+            {(activeCodeTab === 'css' ? copiedCSS : activeCodeTab === 'tailwind' ? copiedTailwind : copiedReact) ? (
+              <>
+                <Check className="h-4.5 w-4.5 text-emerald-500" />
+                <span className="text-[10px] font-black uppercase text-emerald-500 font-display">Copied!</span>
+              </>
+            ) : (
+              <>
+                <Copy className="h-4.5 w-4.5 text-indigo-400" />
+                <span className="text-[10px] font-black uppercase font-display text-slate-300">Copy Code</span>
+              </>
+            )}
+          </button>
 
-              <div className="p-3.5 bg-slate-950 rounded-xl border border-slate-850 font-mono text-[11px] leading-relaxed text-indigo-200 overflow-x-auto select-all whitespace-pre h-[140px] flex items-start justify-start">
-                <code className="w-full text-left block">{cssCode}</code>
-              </div>
-            </div>
-          </div>
-
-          {/* TAILWIND CSS BOX */}
-          <div className="space-y-3 flex flex-col justify-between h-full bg-slate-50/50 dark:bg-slate-950/30 p-4.5 rounded-xl border border-slate-150 dark:border-slate-850">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-wider text-slate-650 dark:text-slate-350">
-                <span>2. Tailwind CSS Arbitrary Class</span>
-                <button
-                  onClick={() => copyToClipboard(getTailwindCode(), 'tailwind')}
-                  className="px-2.5 py-1 rounded-lg text-[10px] font-bold text-indigo-650 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 hover:bg-indigo-105 duration-150 flex items-center gap-1 cursor-pointer font-display"
-                >
-                  {copiedTailwind ? (
-                    <>
-                      <Check className="h-3 w-3 text-emerald-500" /> COPIED!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3 w-3" /> COPY CLASS
-                    </>
-                  )}
-                </button>
-              </div>
-
-              <div className="p-3.5 bg-slate-950 rounded-xl border border-slate-850 font-mono text-[11px] leading-relaxed text-purple-200 overflow-x-auto select-all whitespace-pre h-[140px] flex items-start justify-start">
-                <code className="w-full text-left block">{getTailwindCode()}</code>
-              </div>
-            </div>
-          </div>
-
-          {/* REACT CONST DECLARATION BOX */}
-          <div className="space-y-3 flex flex-col justify-between h-full bg-slate-50/50 dark:bg-slate-950/30 p-4.5 rounded-xl border border-slate-150 dark:border-slate-850">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-wider text-slate-650 dark:text-slate-350">
-                <span>3. React Inline Style Declaration</span>
-                <button
-                  onClick={() => copyToClipboard(reactCode, 'react')}
-                  className="px-2.5 py-1 rounded-lg text-[10px] font-bold text-indigo-655 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 hover:bg-indigo-105 duration-150 flex items-center gap-1 cursor-pointer font-display"
-                >
-                  {copiedReact ? (
-                    <>
-                      <Check className="h-3 w-3 text-emerald-550" /> COPIED!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3 w-3" /> COPY INLINE JS
-                    </>
-                  )}
-                </button>
-              </div>
-
-              <div className="p-3.5 bg-slate-950 rounded-xl border border-slate-850 font-mono text-[11px] leading-relaxed text-blue-200 overflow-x-auto select-all whitespace-pre h-[140px] flex items-start justify-start">
-                <code className="w-full text-left block">{reactCode}</code>
-              </div>
-            </div>
-          </div>
-
+          {/* Print Code segment */}
+          <pre className="text-xs font-mono font-bold text-slate-300 text-left whitespace-pre select-all pt-4 leading-normal max-h-[350px] scrollbar-thin">
+            {activeCodeTab === 'css' && cssCode}
+            {activeCodeTab === 'tailwind' && getTailwindCode()}
+            {activeCodeTab === 'react' && reactCode}
+          </pre>
         </div>
 
       </div>

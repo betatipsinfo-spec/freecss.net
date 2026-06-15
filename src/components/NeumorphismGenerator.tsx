@@ -4,7 +4,8 @@ import {
   Square, Circle, Sliders, Copy, Check, RotateCcw, Compass, 
   Lightbulb, HelpCircle, Palette, Sparkles, Code, Layout, 
   Layers, Volume2, Play, SkipBack, SkipForward, ArrowUpLeft, 
-  ArrowUpRight, ArrowDownLeft, ArrowDownRight, Sun, Moon, Info
+  ArrowUpRight, ArrowDownLeft, ArrowDownRight, Sun, Moon, Info,
+  Box, BadgeInfo
 } from 'lucide-react';
 
 type ShapeStyle = 'flat' | 'concave' | 'convex' | 'pressed';
@@ -47,6 +48,7 @@ export default function NeumorphismGenerator() {
   const [copiedCSS, setCopiedCSS] = useState<boolean>(false);
   const [copiedTailwind, setCopiedTailwind] = useState<boolean>(false);
   const [copiedReact, setCopiedReact] = useState<boolean>(false);
+  const [activeCodeTab, setActiveCodeTab] = useState<'css' | 'tailwind' | 'react'>('css');
 
   // Auto-blur sync lock standard (true by default: blur = 2x distance)
   const [syncBlur, setSyncBlur] = useState<boolean>(true);
@@ -258,40 +260,25 @@ box-shadow: ${getBoxShadowProperty()};`;
   ];
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto px-4 py-6 sm:py-10 animate-fade-in" id="neumorphism-workspace">
+    <div className="space-y-6 animate-fade-in" id="neumorphism-workspace">
       
-      {/* HEADER UNIT */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-150 dark:border-slate-800 pb-6">
-        <div>
-          <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-display font-black text-xs uppercase tracking-widest mb-1.5 animate-pulse">
-            <Sparkles className="h-4 w-4" /> soft ui styling studio
-          </div>
-          <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white uppercase font-display sm:text-4xl">
-            Neumorphism Soft-Shadow Generator
-          </h1>
-          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 font-display font-medium uppercase tracking-wider">
-            Sophisticated dual-shadow modeling playground for flat, concave, convex, and pressed design system components
-          </p>
-        </div>
-
-        {/* Reset actions */}
-        <button
-          onClick={handleReset}
-          className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase tracking-wider font-display rounded-xl border border-slate-205 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-650 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 cursor-pointer self-start md:self-center transition-all shadow-2xs"
-        >
-          <RotateCcw className="h-3.5 w-3.5" /> Restore Defaults
-        </button>
-      </div>
-
       {/* QUICK COLOR THEMES PALETTE */}
       <div className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-xs font-black uppercase tracking-wider text-slate-400 dark:text-slate-550 flex items-center gap-2 font-display">
-            <Palette className="h-4 w-4 text-indigo-505" /> Choose Neumorphic Canvas Theme
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <h3 className="text-xs font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 flex items-center gap-2 font-display">
+            <Palette className="h-4 w-4 text-indigo-500" /> Choose Neumorphic Canvas Theme
           </h3>
-          <span className="text-[9px] font-mono bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 font-extrabold uppercase px-2 py-0.5 rounded-full">
-            Recommended contrast levels
-          </span>
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              onClick={handleReset}
+              className="flex items-center gap-1.5 px-3 py-1 text-[10px] font-black uppercase tracking-wider font-display rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900 cursor-pointer transition-all shadow-2xs"
+            >
+              <RotateCcw className="h-3 w-3" /> Restore Defaults
+            </button>
+            <span className="text-[9px] font-mono bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 font-extrabold uppercase px-2 py-0.5 rounded-full">
+              Recommended contrast levels
+            </span>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-8 gap-2.5">
@@ -323,7 +310,7 @@ box-shadow: ${getBoxShadowProperty()};`;
                     {preset.name}
                   </p>
                   <p className={`text-[8.5px] font-mono font-medium opacity-75 ${
-                    preset.isDark ? 'text-slate-300' : 'text-slate-550'
+                    preset.isDark ? 'text-slate-300' : 'text-slate-500'
                   }`}>
                     {preset.hex}
                   </p>
@@ -356,8 +343,8 @@ box-shadow: ${getBoxShadowProperty()};`;
               
               {/* Manual Color Picker */}
               <div className="space-y-3">
-                <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-950 p-2 rounded-xl border border-slate-150 dark:border-slate-850">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-450 font-display">
+                <div className="flex justify-between items-center bg-slate-50 dark:bg-slate-900 p-2 rounded-xl border border-slate-200 dark:border-slate-800">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 font-display">
                     Base Hex Color
                   </span>
                   <div className="flex items-center gap-1.5">
@@ -384,7 +371,7 @@ box-shadow: ${getBoxShadowProperty()};`;
                   </div>
                 </div>
 
-                <div className="rounded-xl border border-slate-150 dark:border-slate-850 bg-slate-50 dark:bg-slate-955 p-3.5 text-left text-slate-505 leading-normal space-y-1">
+                <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 p-3.5 text-left text-slate-500 leading-normal space-y-1">
                   <div className="flex items-center gap-1.5 text-indigo-650 dark:text-indigo-400 font-extrabold text-[10px] uppercase font-display">
                     <Info className="h-3.5 w-3.5" /> Neumorphic Notice
                   </div>
@@ -410,8 +397,8 @@ box-shadow: ${getBoxShadowProperty()};`;
                         onClick={() => setLightDir(dir.value)}
                         className={`px-3 py-2 text-[10px] items-center justify-center font-bold uppercase tracking-wider font-display rounded-xl border text-center flex gap-1.5 cursor-pointer transition-all duration-150 ${
                           isSelected
-                            ? 'bg-indigo-50 dark:bg-indigo-950 border-indigo-500 text-indigo-700 dark:text-indigo-305 font-extrabold'
-                            : 'bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-850 text-slate-500 hover:bg-slate-100'
+                            ? 'bg-indigo-50 dark:bg-indigo-950 border-indigo-500 text-indigo-700 dark:text-indigo-300 font-extrabold'
+                            : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
                         }`}
                       >
                         <DirIcon className="h-4 w-4" />
@@ -430,7 +417,7 @@ box-shadow: ${getBoxShadowProperty()};`;
           <div className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs space-y-5">
             
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/80 pb-2">
-              <h3 className="text-xs font-black uppercase tracking-wider text-slate-805 dark:text-slate-250 flex items-center gap-2 font-display">
+              <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2 font-display">
                 <Layers className="h-4 w-4 text-indigo-500" /> Sculpting & Shadow Controls
               </h3>
               <span className="text-[9px] font-mono font-extrabold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded uppercase">
@@ -453,7 +440,7 @@ box-shadow: ${getBoxShadowProperty()};`;
                   step="5"
                   value={size}
                   onChange={(e) => setSize(Number(e.target.value))}
-                  className="w-full h-1.5 bg-slate-150 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                  className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-600"
                 />
               </div>
 
@@ -470,7 +457,7 @@ box-shadow: ${getBoxShadowProperty()};`;
                   step="1"
                   value={radius}
                   onChange={(e) => setRadius(Number(e.target.value))}
-                  className="w-full h-1.5 bg-slate-150 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                  className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-600"
                 />
               </div>
 
@@ -487,17 +474,17 @@ box-shadow: ${getBoxShadowProperty()};`;
                   step="1"
                   value={distance}
                   onChange={(e) => setDistance(Number(e.target.value))}
-                  className="w-full h-1.5 bg-slate-150 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                  className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-600"
                 />
               </div>
 
               {/* Blur slider */}
               <div className="space-y-1">
-                <div className="flex justify-between items-center text-xs font-bold text-slate-655 dark:text-slate-400 uppercase tracking-wider font-display">
+                <div className="flex justify-between items-center text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider font-display">
                   <span>Shadow Softness (Blur Radius)</span>
                   <div className="flex items-center gap-2">
                     {syncBlur && (
-                      <span className="text-[9px] font-mono text-emerald-600 bg-emerald-55/60 dark:bg-emerald-950/40 px-1 py-0.5 rounded font-black">
+                      <span className="text-[9px] font-mono text-emerald-600 bg-emerald-100/60 dark:bg-emerald-950/40 px-1 py-0.5 rounded font-black">
                         AUTO (2X)
                       </span>
                     )}
@@ -513,7 +500,7 @@ box-shadow: ${getBoxShadowProperty()};`;
                     value={blur}
                     disabled={syncBlur}
                     onChange={(e) => setBlur(Number(e.target.value))}
-                    className="flex-1 h-1.5 bg-slate-150 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-600 disabled:opacity-50"
+                    className="flex-1 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-600 disabled:opacity-50"
                   />
                   <button
                     type="button"
@@ -543,7 +530,7 @@ box-shadow: ${getBoxShadowProperty()};`;
                   step="1"
                   value={intensity}
                   onChange={(e) => setIntensity(Number(e.target.value))}
-                  className="w-full h-1.5 bg-slate-150 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                  className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-600"
                 />
               </div>
 
@@ -560,7 +547,7 @@ box-shadow: ${getBoxShadowProperty()};`;
                   step="0.05"
                   value={opacity}
                   onChange={(e) => setOpacity(Number(e.target.value))}
-                  className="w-full h-1.5 bg-slate-150 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                  className="w-full h-1.5 bg-slate-200 dark:bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-600"
                 />
               </div>
 
@@ -571,7 +558,7 @@ box-shadow: ${getBoxShadowProperty()};`;
         </div>
 
         {/* RIGHT COLUMN: PREVIEW STAGE & CODE EXPORTERS (5 Cols) */}
-        <div className="lg:col-span-5 space-y-6">
+        <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-24">
 
           {/* ACTIVE PREVIEW STAGE BOARD (Has same color as background of container in Neumorphism rules) */}
           <div 
@@ -616,10 +603,10 @@ box-shadow: ${getBoxShadowProperty()};`;
                 {/* PREVIEW CONTENT TYPES CONTROLLER */}
                 {previewAddon === 'text' && (
                   <div className="animate-fade-in space-y-1 pointer-events-none select-none">
-                    <h4 className="text-xs uppercase font-black tracking-widest text-indigo-755/90">
+                    <h4 className="text-xs uppercase font-black tracking-widest text-indigo-600/90">
                       Soft Card
                     </h4>
-                    <p className="text-[10px] font-mono text-slate-550 leading-none">
+                    <p className="text-[10px] font-mono text-slate-500 leading-none">
                       {shapeStyle === 'pressed' ? 'Pressed-in' : 'Pristine'}
                     </p>
                   </div>
@@ -635,12 +622,12 @@ box-shadow: ${getBoxShadowProperty()};`;
                     
                     {/* Tiny continuous mock slider */}
                     <div className="w-16 h-1 bg-slate-900/10 dark:bg-white/10 rounded overflow-hidden">
-                      <div className="w-9 h-full bg-indigo-550" />
+                      <div className="w-9 h-full bg-indigo-600" />
                     </div>
 
                     {/* Controller dials */}
                     <div className="flex space-x-3 items-center">
-                      <SkipBack className="h-3 w-3 text-slate-450" />
+                      <SkipBack className="h-3 w-3 text-slate-400" />
                       <div 
                         className="rounded-full flex items-center justify-center"
                         style={{
@@ -652,7 +639,7 @@ box-shadow: ${getBoxShadowProperty()};`;
                       >
                         <Play className="h-2 w-2 text-indigo-600 fill-indigo-600 ml-0.5 animate-pulse" />
                       </div>
-                      <SkipForward className="h-3 w-3 text-slate-450" />
+                      <SkipForward className="h-3 w-3 text-slate-400" />
                     </div>
                   </div>
                 )}
@@ -704,116 +691,81 @@ box-shadow: ${getBoxShadowProperty()};`;
 
       </div>
 
-      {/* FULL-WIDTH REAL TIME EXPORT PANEL */}
-      <div className="bg-white dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs space-y-6 font-display animate-fade-in">
+      {/* FULL-WIDTH REAL TIME EXPORT PANEL (Styled similarly to Export Transform Styles) */}
+      <div className="mt-8 bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm animate-fade-in">
         
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
-          <div>
-            <h3 className="text-sm font-black uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-2 font-display">
-              <Code className="h-5 w-5 text-indigo-500" /> Real-time Export Panel
+        <div className="flex items-center justify-between mb-4 border-b border-slate-100 dark:border-slate-800 pb-3">
+          <div className="flex items-center gap-2">
+            <Box className="h-4.5 w-4.5 text-indigo-500" />
+            <h3 className="text-md font-black uppercase tracking-wider font-display text-slate-800 dark:text-white">
+              Export Neumorphic Styles
             </h3>
-            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">
-              Copy generated softneumorphism shadow parameters instantly in your preferred format
-            </p>
           </div>
-          <span className="self-start sm:self-center text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/50 dark:border-emerald-900/55 px-3 py-1 rounded-xl uppercase tracking-wider animate-pulse flex items-center gap-1">
-            <Sparkles className="h-3 w-3" /> Live Synced
-          </span>
+
+          <div className="flex rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1">
+            {(['css', 'tailwind', 'react'] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveCodeTab(tab)}
+                className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider font-display rounded-lg transition-all cursor-pointer ${
+                  activeCodeTab === tab
+                    ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-705'
+                }`}
+              >
+                {tab}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* RAW CSS BOX */}
-          <div className="space-y-3 flex flex-col justify-between h-full bg-slate-50/55 dark:bg-slate-950/40 p-4.5 rounded-xl border border-slate-150 dark:border-slate-850">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-wider text-slate-650 dark:text-slate-300">
-                <span>1. Standard CSS3</span>
-                <button
-                  onClick={() => copyToClipboard(cssCode, 'css')}
-                  className="px-2.5 py-1 rounded-lg text-[10px] font-bold text-indigo-650 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/80 duration-150 flex items-center gap-1 cursor-pointer font-display"
-                >
-                  {copiedCSS ? (
-                    <>
-                      <Check className="h-3 w-3 text-emerald-500" /> COPIED!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3 w-3" /> COPY CSS
-                    </>
-                  )}
-                </button>
-              </div>
+        {/* Compiled code block */}
+        <div className="relative rounded-2xl bg-slate-950 p-5 mt-4 min-h-[140px] border border-slate-800 overflow-x-auto animate-fade-in">
+          
+          {/* Copy button */}
+          <button
+            onClick={() => {
+              const targetCode = activeCodeTab === 'css' 
+                ? cssCode 
+                : activeCodeTab === 'tailwind' 
+                ? tailwindCode 
+                : reactCode;
+              copyToClipboard(targetCode, activeCodeTab);
+            }}
+            className="absolute top-4 right-4 p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 hover:border-slate-700 text-slate-400 cursor-pointer transition-all z-10 flex items-center gap-1.5"
+          >
+            {(activeCodeTab === 'css' ? copiedCSS : activeCodeTab === 'tailwind' ? copiedTailwind : copiedReact) ? (
+              <>
+                <Check className="h-4.5 w-4.5 text-emerald-500" />
+                <span className="text-[10px] font-black uppercase text-emerald-500 font-display">Copied!</span>
+              </>
+            ) : (
+              <>
+                <Copy className="h-4.5 w-4.5 text-indigo-400" />
+                <span className="text-[10px] font-black uppercase font-display text-slate-300">Copy Code</span>
+              </>
+            )}
+          </button>
 
-              <div className="p-3.5 bg-slate-950 rounded-xl border border-slate-850 font-mono text-[11px] leading-relaxed text-indigo-200 overflow-x-auto select-all whitespace-pre h-[140px] flex items-start justify-start">
-                <code className="w-full text-left block">{cssCode}</code>
-              </div>
-            </div>
-          </div>
+          {/* Print Code segment */}
+          <pre className="text-xs font-mono font-bold text-slate-300 text-left whitespace-pre select-all pt-4 leading-normal">
+            {activeCodeTab === 'css' && cssCode}
+            {activeCodeTab === 'tailwind' && tailwindCode}
+            {activeCodeTab === 'react' && reactCode}
+          </pre>
 
-          {/* TAILWIND CSS BOX */}
-          <div className="space-y-3 flex flex-col justify-between h-full bg-slate-50/55 dark:bg-slate-950/40 p-4.5 rounded-xl border border-slate-150 dark:border-slate-850">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-wider text-slate-650 dark:text-slate-300">
-                <span>2. Tailwind Arbitrary Class</span>
-                <button
-                  onClick={() => copyToClipboard(tailwindCode, 'tailwind')}
-                  className="px-2.5 py-1 rounded-lg text-[10px] font-bold text-indigo-650 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/80 duration-150 flex items-center gap-1 cursor-pointer font-display"
-                >
-                  {copiedTailwind ? (
-                    <>
-                      <Check className="h-3 w-3 text-emerald-500" /> COPIED!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3 w-3" /> COPY TAILWIND
-                    </>
-                  )}
-                </button>
-              </div>
-
-              <div className="p-3.5 bg-slate-950 rounded-xl border border-slate-850 font-mono text-[11px] leading-relaxed text-purple-200 overflow-x-auto select-all whitespace-pre h-[140px] flex items-start justify-start">
-                <code className="w-full text-left block">{tailwindCode}</code>
-              </div>
-            </div>
-          </div>
-
-          {/* REACT CONST DECLARATION BOX */}
-          <div className="space-y-3 flex flex-col justify-between h-full bg-slate-50/55 dark:bg-slate-950/40 p-4.5 rounded-xl border border-slate-150 dark:border-slate-850">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-wider text-slate-655 dark:text-slate-300">
-                <span>3. React Inline Style</span>
-                <button
-                  onClick={() => copyToClipboard(reactCode, 'react')}
-                  className="px-2.5 py-1 rounded-lg text-[10px] font-bold text-indigo-655 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/80 duration-150 flex items-center gap-1 cursor-pointer font-display"
-                >
-                  {copiedReact ? (
-                    <>
-                      <Check className="h-3 w-3 text-emerald-555" /> COPIED!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3 w-3" /> COPY INLINE JS
-                    </>
-                  )}
-                </button>
-              </div>
-
-              <div className="p-3.5 bg-slate-950 rounded-xl border border-slate-850 font-mono text-[11px] leading-relaxed text-blue-250 overflow-x-auto select-all whitespace-pre h-[140px] flex items-start justify-start">
-                <code className="w-full text-left block">{reactCode}</code>
-              </div>
-            </div>
-          </div>
         </div>
 
       </div>
 
       {/* FOOTER EDUCATION COMPASS */}
-      <div className="bg-slate-55 dark:bg-slate-955 rounded-2xl border-2 border-slate-200 dark:border-slate-850 p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="bg-slate-50 dark:bg-slate-900 rounded-2xl border-2 border-slate-200 dark:border-slate-800 p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
         <div className="flex items-center gap-5">
           <div className="bg-indigo-50 dark:bg-indigo-950 p-3 rounded-xl border border-indigo-200 dark:border-indigo-900">
             <Compass className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
           </div>
           <div>
-            <h4 className="text-xs uppercase font-black tracking-wider text-slate-850 dark:text-white">
+            <h4 className="text-xs uppercase font-black tracking-wider text-slate-800 dark:text-white">
               About Soft Neumorphism Architecture
             </h4>
             <p className="text-[11px] leading-relaxed text-slate-500 max-w-xl">

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { 
   Sparkles, Copy, Check, RefreshCw, Eye, Layers, Sliders, 
   Palette, Zap, Code, Heart, HelpCircle, ArrowRight, FileCode,
-  ChevronDown, ChevronUp
+  ChevronDown, ChevronUp, Box, BadgeInfo
 } from 'lucide-react';
 
 interface HoverPreset {
@@ -295,10 +295,14 @@ export default function HoverEffectsGenerator() {
   const [forceHover, setForceHover] = useState<boolean>(false);
   const [sandboxText, setSandboxText] = useState<string>('Interactive Card');
   const [copiedType, setCopiedType] = useState<'tailwind' | 'css' | null>(null);
+  const [activeCodeTab, setActiveCodeTab] = useState<'css' | 'tailwind' | 'react'>('css');
+  const [copiedText, setCopiedText] = useState<string | null>(null);
 
   // Auto response state when scrolling down or up
   const [isScrolling, setIsScrolling] = useState<boolean>(false);
   const [scrollDelta, setScrollDelta] = useState<number>(0);
+
+  const previewStageRef = React.useRef<HTMLDivElement>(null);
 
   // Clean React state for interactive canvas hover tracking
   const [hoveredCard, setHoveredCard] = useState<boolean>(false);
@@ -308,35 +312,33 @@ export default function HoverEffectsGenerator() {
   const currentGlow = parseGlowPreset(glowColor);
 
   React.useEffect(() => {
-    let lastScrollY = window.scrollY;
-    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    let lastScrollY = typeof window !== 'undefined' ? window.scrollY : 0;
+    let animFrameId: number;
     let lastTouchY = 0;
 
+    // Track targets & animated values
+    const physics = {
+      target: 0,
+      current: 0,
+    };
+
     const triggerScrolling = (delta: number) => {
-      if (Math.abs(delta) > 1) {
-        setScrollDelta(delta);
-        setIsScrolling(true);
-        
-        if (timeoutId) {
-          clearTimeout(timeoutId);
-        }
-        
-        timeoutId = setTimeout(() => {
-          setIsScrolling(false);
-          setScrollDelta(0);
-        }, 400);
-      }
+      // Direct integration of scrolling impulses
+      // Clamp incoming scroll velocities to reasonable ranges to prevent wild spikes
+      const clampedDelta = Math.min(Math.max(delta, -180), 180);
+      physics.target += clampedDelta;
     };
 
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
       const delta = currentScrollY - lastScrollY;
-      triggerScrolling(delta);
+      triggerScrolling(delta * 2.8); // Boost scroll delta slightly for better feedback
       lastScrollY = currentScrollY;
     };
 
     const handleWheel = (e: WheelEvent) => {
-      triggerScrolling(e.deltaY);
+      // Capture and integrate wheel scroll distance
+      triggerScrolling(e.deltaY * 0.9);
     };
 
     const handleTouchStart = (e: TouchEvent) => {
@@ -349,22 +351,67 @@ export default function HoverEffectsGenerator() {
       if (e.touches && e.touches[0]) {
         const currentTouchY = e.touches[0].clientY;
         const delta = lastTouchY - currentTouchY; // positive delta means scrolling down
-        triggerScrolling(delta);
+        triggerScrolling(delta * 2.5);
         lastTouchY = currentTouchY;
       }
     };
 
+    // Physics decay and interpolation loop using RequestAnimationFrame
+    const updatePhysics = () => {
+      // Lerp (Linear Interpolation) for buttery smooth decay
+      physics.current += (physics.target - physics.current) * 0.12;
+      
+      // Decay the target over time so it slows down naturally when input stops
+      physics.target *= 0.82;
+
+      const deltaAbs = Math.abs(physics.current);
+      
+      if (deltaAbs > 0.15) {
+        setScrollDelta(physics.current);
+        setIsScrolling(true);
+      } else {
+        // Snapping stable state
+        physics.current = 0;
+        physics.target = 0;
+        setScrollDelta(0);
+        setIsScrolling(false);
+      }
+
+      animFrameId = requestAnimationFrame(updatePhysics);
+    };
+
+    // Play/start animation frame loop
+    animFrameId = requestAnimationFrame(updatePhysics);
+
+    // 1. Attach listeners wrapper globally
     window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('wheel', handleWheel, { passive: true });
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
     window.addEventListener('touchmove', handleTouchMove, { passive: true });
+
+    // 2. Attach listeners specifically to the live stage preview container if available
+    const stageEl = previewStageRef.current;
+    if (stageEl) {
+      stageEl.addEventListener('scroll', handleScroll, { passive: true });
+      stageEl.addEventListener('wheel', handleWheel, { passive: true });
+      stageEl.addEventListener('touchstart', handleTouchStart, { passive: true });
+      stageEl.addEventListener('touchmove', handleTouchMove, { passive: true });
+    }
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('wheel', handleWheel);
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchmove', handleTouchMove);
-      if (timeoutId) clearTimeout(timeoutId);
+
+      if (stageEl) {
+        stageEl.removeEventListener('scroll', handleScroll);
+        stageEl.removeEventListener('wheel', handleWheel);
+        stageEl.removeEventListener('touchstart', handleTouchStart);
+        stageEl.removeEventListener('touchmove', handleTouchMove);
+      }
+
+      cancelAnimationFrame(animFrameId);
     };
   }, []);
 
@@ -493,11 +540,46 @@ export default function HoverEffectsGenerator() {
     return `transition-all ${durationClass} ${easeClass} bg-gradient-to-br ${bgNormal} hover:bg-gradient-to-br hover:${bgHover} ${textNormal} hover:${textHover} ${radius} ${padding} ${border} ${borderOnHover} ${shadowNormal} hover:${shadowHover} ${scaleClass} ${rotateClass} ${transXClass} ${transYClass} ${skewXClass} ${skewYClass}`;
   };
 
-  const copyToClipboard = (code: string, type: 'tailwind' | 'css') => {
+  const generateReactCode = () => {
+    return `import { motion } from 'motion/react';
+
+// Hover Animation Style object
+const hoverStyle = {
+  transform: 'translate3d(${translateX}px, ${translateY}px, 0) scale(${scale}) rotate(${rotate}deg) skew(${skewX}deg, ${skewY}deg)',
+  transition: 'all ${duration}ms ${timing}',
+  boxShadow: '0 20px 40px -15px ${glowColor}',
+  background: 'linear-gradient(135deg, ${bgHovStart}, ${bgHovEnd})',
+  color: '${textHovHex}',
+  borderColor: '${borderHovHex}'
+};
+
+// Render in JSX using standard events or framer-motion library:
+<motion.div
+  whileHover={{
+    scale: ${scale},
+    x: ${translateX},
+    y: ${translateY},
+    rotate: ${rotate},
+    skewX: ${skewX},
+    skewY: ${skewY}
+  }}
+  transition={{ type: "tween", ease: "${timing}", duration: ${duration / 1000} }}
+  className="p-6 rounded-2xl border"
+  style={{
+    background: 'linear-gradient(135deg, ${bgNormStart}, ${bgNormEnd})',
+    color: '${textNormHex}',
+    borderColor: '${borderNormHex}'
+  }}
+>
+  Hover Me Seamlessly!
+</motion.div>`;
+  };
+
+  const copyToClipboard = (code: string, tab: 'css' | 'tailwind' | 'react') => {
     navigator.clipboard.writeText(code);
-    setCopiedType(type);
+    setCopiedText(tab);
     setTimeout(() => {
-      setCopiedType(null);
+      setCopiedText(null);
     }, 2000);
   };
 
@@ -531,45 +613,7 @@ export default function HoverEffectsGenerator() {
   };
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 animate-fade-in font-display select-none">
-      
-      {/* Page Header */}
-      <div className="mb-8 text-center md:text-left">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 border border-indigo-200/40 dark:border-indigo-900/40 mb-3">
-              <Sparkles className="h-3 w-3" />
-              <span>UI Creative Engine</span>
-            </div>
-            <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white uppercase font-display sm:text-4xl">
-              Hover Effects Generator
-            </h1>
-            <p className="mt-2 text-sm text-slate-550 dark:text-slate-400 max-w-2xl font-sans">
-              Interactively craft and preview gorgeous CSS transition animations. Generate production-ready Tailwind utility shorthand or pristine static stylesheets with zero fluff.
-            </p>
-          </div>
-          
-          <div className="flex items-center justify-center md:justify-end gap-3 font-display">
-            <button
-              onClick={handleReset}
-              className="flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-50 dark:bg-slate-900 hover:bg-slate-100/90 dark:hover:bg-slate-850 transition-all border border-slate-205 dark:border-slate-800 cursor-pointer"
-            >
-              <RefreshCw className="h-3.5 w-3.5" />
-              <span>Reset Values</span>
-            </button>
-            
-            <label className="flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-150 dark:border-indigo-900/50 cursor-pointer transition-all">
-              <input
-                type="checkbox"
-                checked={forceHover}
-                onChange={(e) => setForceHover(e.target.checked)}
-                className="rounded border-slate-300 dark:border-slate-750 text-indigo-600 focus:ring-indigo-500 h-4 w-4"
-              />
-              <span className="text-indigo-700 dark:text-indigo-400">Lock Hover State</span>
-            </label>
-          </div>
-        </div>
-      </div>
+    <div className="animate-fade-in relative space-y-8" id="hover-effects-workspace">
 
       {/* Main Grid: left editor, right preview + code output */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -579,11 +623,31 @@ export default function HoverEffectsGenerator() {
           
           {/* Quick Presets Catalog */}
           <div className="bg-white dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-850 rounded-2xl p-5 shadow-sm">
-            <div className="flex items-center gap-2 mb-4 border-b border-slate-100 dark:border-slate-800/60 pb-3">
-              <Layers className="h-4.5 w-4.5 text-indigo-600" />
-              <h2 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-100">
-                Aesthetic Quick Presets
-              </h2>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800/60 pb-3 mb-4">
+              <div className="flex items-center gap-2">
+                <Layers className="h-4.5 w-4.5 text-indigo-600" />
+                <h2 className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-100 font-display">
+                  Aesthetic Quick Presets
+                </h2>
+              </div>
+              <div className="flex items-center gap-2.5 font-display">
+                <button
+                  onClick={handleReset}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-rose-200 hover:border-rose-300 dark:border-rose-950/45 bg-rose-50/50 hover:bg-rose-100/50 dark:bg-rose-950/20 text-rose-650 dark:text-rose-450 text-[10px] font-black uppercase tracking-wider font-display transition-all cursor-pointer"
+                >
+                  <RefreshCw className="h-3 w-3" />
+                  Reset
+                </button>
+                <label className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-indigo-150 dark:border-indigo-900/5 bg-indigo-50/30 dark:bg-indigo-950/20 text-indigo-700 dark:text-indigo-400 text-[10px] font-black uppercase tracking-wider font-display cursor-pointer transition-all">
+                  <input
+                    type="checkbox"
+                    checked={forceHover}
+                    onChange={(e) => setForceHover(e.target.checked)}
+                    className="rounded border-slate-300 dark:border-slate-750 text-indigo-600 focus:ring-indigo-500 h-3.5 w-3.5"
+                  />
+                  <span>Lock Hover</span>
+                </label>
+              </div>
             </div>
             
             <div className="space-y-2">
@@ -1457,7 +1521,10 @@ export default function HoverEffectsGenerator() {
         <div className="lg:col-span-7 space-y-6 lg:sticky lg:top-8 z-20">
           
           {/* Web Interactive Sandbox Showcase */}
-          <div className="bg-slate-100/60 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-850 rounded-2xl p-6 relative overflow-hidden flex flex-col items-center">
+          <div 
+            ref={previewStageRef}
+            className="bg-slate-100/60 dark:bg-slate-900 border-2 border-slate-200 dark:border-slate-850 rounded-2xl p-6 relative overflow-hidden flex flex-col items-center"
+          >
             
             {/* Visual Dot Grid background decorator */}
             <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1.5px,transparent_1.5px)] dark:bg-[radial-gradient(#334155_1.2px,transparent_1.2px)] [background-size:16px_16px] pointer-events-none opacity-40" />
@@ -1663,109 +1730,105 @@ export default function HoverEffectsGenerator() {
 
       </div>
 
-      {/* New Section: Full width 12 columns area container with Tailwind & Pure CSS side-by-side */}
-      <div className="mt-8 pt-8 border-t border-slate-200 dark:border-slate-800 animate-fade-in" id="hover-effect-exports-section">
-        <div className="mb-6">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-200/25 mb-2.5">
-            <Code className="h-3 w-3" /> Ready-to-use Compiled Code
+      {/* CODE COMPILER EXPORT COMPONENT - 12 Column full-width section below grid, above Explore Other Generators */}
+      <div className="bg-white dark:bg-slate-950 border-2 border-slate-150 dark:border-slate-850 rounded-3xl p-6 shadow-sm mt-8 animate-fade-in animate-duration-500" id="hover-effect-exports-section">
+        
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 border-b border-slate-100 dark:border-slate-850 pb-3">
+          <div className="flex items-center gap-2">
+            <Box className="h-4.5 w-4.5 text-indigo-500" />
+            <div>
+              <h3 className="text-md font-black uppercase tracking-wider font-display text-slate-800 dark:text-white">
+                Export Transform & Hover Styles
+              </h3>
+              <p className="text-[10px] text-slate-450 uppercase tracking-widest font-mono">
+                Deploy lightweight, high-performance physical hover interactions directly into your design system
+              </p>
+            </div>
           </div>
-          <h2 className="text-sm font-black uppercase tracking-tight text-slate-800 dark:text-slate-100">
-            Hover Action & Style Exports
-          </h2>
-          <p className="text-[11px] md:text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-2xl leading-relaxed">
-            Copy these production-ready configurations into your project buttons, navigation links, or bento layout modules to enjoy hardware-accelerated fluid transitions.
-          </p>
+
+          <div className="flex rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-150 dark:border-slate-850 p-1">
+            {[
+              { id: 'css', label: 'css ruleset' },
+              { id: 'tailwind', label: 'tailwind class' },
+              { id: 'react', label: 'react / jsx' }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveCodeTab(tab.id as 'css' | 'tailwind' | 'react')}
+                className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-wider font-display rounded-lg transition-all cursor-pointer ${
+                  activeCodeTab === tab.id
+                    ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm font-black'
+                    : 'text-slate-500 hover:text-slate-755'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          
-          {/* Box 1: Tailwind Utility Shorthand */}
-          <div className="bg-white dark:bg-slate-950 border border-slate-150 dark:border-slate-850 rounded-2xl shadow-sm p-5 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <div className="h-5.5 w-5.5 bg-sky-450 dark:bg-sky-505 rounded flex items-center justify-center text-white font-black text-[9px] shadow-sm select-none">
-                    TW
-                  </div>
-                  <span className="text-xs font-black uppercase tracking-wider text-slate-850 dark:text-slate-100">
-                    Tailwind Utility Shorthand
-                  </span>
-                </div>
-                
-                <button
-                  type="button"
-                  id="btn-copy-tailwind-shorthand"
-                  onClick={() => copyToClipboard(generateTailwindClass(), 'tailwind')}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider text-indigo-650 dark:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 transition-all cursor-pointer"
-                >
-                  {copiedType === 'tailwind' ? (
-                    <>
-                      <Check className="h-3 w-3 text-emerald-500 animate-pulse" />
-                      <span className="text-emerald-505 dark:text-emerald-400 font-bold">Copied!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3 w-3" />
-                      <span>Copy Utility</span>
-                    </>
-                  )}
-                </button>
-              </div>
+        <div className="space-y-4">
+          <div className="relative">
+            <button
+              onClick={() => {
+                const code = activeCodeTab === 'css' 
+                  ? generateRawCSS() 
+                  : activeCodeTab === 'tailwind' 
+                    ? generateTailwindClass() 
+                    : generateReactCode();
+                copyToClipboard(code, activeCodeTab);
+              }}
+              className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider text-indigo-650 dark:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 transition-all cursor-pointer z-10 bg-white/80 dark:bg-slate-950/80 backdrop-blur"
+            >
+              {copiedText === activeCodeTab ? (
+                <>
+                  <Check className="h-3 text-emerald-500 animate-pulse" />
+                  <span className="text-emerald-505 dark:text-emerald-400 font-black">Copied!</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="h-3 w-3" />
+                  <span>Copy Code String</span>
+                </>
+              )}
+            </button>
 
-              <div className="bg-slate-50 dark:bg-slate-900 rounded-xl p-4 border border-slate-150 dark:border-slate-850 font-mono text-[10.5px] font-semibold text-slate-700 dark:text-slate-350 break-all leading-relaxed select-all">
-                {generateTailwindClass()}
-              </div>
-            </div>
-            <div className="mt-4 pt-3.5 border-t border-slate-100 dark:border-slate-850/60 flex items-center justify-between text-[9px] font-black uppercase tracking-wider text-slate-400">
-              <span>Standard utility list with exact timings</span>
-              <span className="text-indigo-500 font-sans tracking-normal">@tailwindcss v4 / v3 style</span>
+            <div className="bg-slate-50/50 dark:bg-slate-900/60 rounded-2xl p-5 border border-slate-150 dark:border-slate-850 font-mono text-xs leading-relaxed overflow-x-auto text-slate-750 dark:text-slate-300">
+              {activeCodeTab === 'css' && (
+                <pre className="max-h-64 overflow-y-auto scrollbar-thin">
+                  <code>{generateRawCSS()}</code>
+                </pre>
+              )}
+              {activeCodeTab === 'tailwind' && (
+                <div className="break-all font-semibold select-all">
+                  {generateTailwindClass()}
+                </div>
+              )}
+              {activeCodeTab === 'react' && (
+                <pre className="max-h-72 overflow-y-auto scrollbar-thin">
+                  <code>{generateReactCode()}</code>
+                </pre>
+              )}
             </div>
           </div>
 
-          {/* Box 2: Pure CSS Declaration Ruleset */}
-          <div className="bg-white dark:bg-slate-950 border border-slate-150 dark:border-slate-850 rounded-2xl shadow-sm p-5 flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <div className="h-5.5 w-5.5 bg-indigo-600 rounded flex items-center justify-center text-white font-black text-[9px] shadow-sm select-none">
-                    CSS
-                  </div>
-                  <span className="text-xs font-black uppercase tracking-wider text-slate-850 dark:text-slate-100">
-                    Pure CSS Declaration
-                  </span>
-                </div>
-                
-                <button
-                  type="button"
-                  id="btn-copy-raw-css-ruleset"
-                  onClick={() => copyToClipboard(generateRawCSS(), 'css')}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider text-indigo-650 dark:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 transition-all cursor-pointer"
-                >
-                  {copiedType === 'css' ? (
-                    <>
-                      <Check className="h-3 w-3 text-emerald-500 animate-pulse" />
-                      <span className="text-emerald-550 dark:text-emerald-400 font-bold">Copied!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3 w-3" />
-                      <span>Copy Ruleset</span>
-                    </>
-                  )}
-                </button>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-indigo-500/5 dark:bg-indigo-950/20 border border-indigo-500/10 rounded-2xl p-4">
+            <div className="flex gap-2 text-xs leading-relaxed text-indigo-805 dark:text-indigo-350">
+              <BadgeInfo className="h-4 w-4 text-indigo-505 shrink-0 mt-0.5" />
+              <div className="space-y-0.5">
+                <span className="font-bold text-[10px] uppercase tracking-wider block text-indigo-600 dark:text-indigo-400">
+                  Integration Blueprint Advice
+                </span>
+                <p className="font-sans text-[11px] opacity-90 max-w-2xl leading-normal text-slate-600 dark:text-slate-400">
+                  {activeCodeTab === 'css' && "Include standard custom timing functions in your system style sheets to enable sub-pixel interpolation."}
+                  {activeCodeTab === 'tailwind' && "Requires standard config hooks or relative inline parameters to inject custom durations dynamically."}
+                  {activeCodeTab === 'react' && "Requires importing standard motion hooks from the lightweight frame animation library."}
+                </p>
               </div>
-
-              <pre className="bg-slate-50 dark:bg-slate-900 rounded-xl p-4 border border-slate-150 dark:border-slate-850 font-mono text-[10px] font-semibold text-slate-705 dark:text-slate-350 overflow-x-auto leading-relaxed select-all max-h-52">
-                <code>{generateRawCSS()}</code>
-              </pre>
-            </div>
-            <div className="mt-4 pt-3.5 border-t border-slate-100 dark:border-slate-850/60 flex items-center justify-between text-[9px] font-black uppercase tracking-wider text-slate-400">
-              <span>GPU-accelerated transform matrix</span>
-              <span className="text-indigo-500 font-sans tracking-normal">Supports :hover modifier</span>
             </div>
           </div>
-
         </div>
+
       </div>
 
     </div>

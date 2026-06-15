@@ -375,38 +375,8 @@ export default function PatternBackground() {
   return (
     <div className="animate-fade-in relative">
       
-      {/* Visual Header Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-8 rounded-3xl bg-linear-to-r from-slate-900 via-violet-950 to-slate-900 border-2 border-slate-800 text-white shadow-xl relative overflow-hidden mb-8">
-        <div className="absolute top-0 right-0 h-40 w-40 bg-violet-500/10 blur-3xl rounded-full" />
-        <div className="absolute -bottom-10 left-1/3 h-48 w-48 bg-fuchsia-500/10 blur-3xl rounded-full" />
-
-        <div className="z-10 flex-1">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/20 text-violet-300 border border-violet-500/30 text-[10px] font-black uppercase tracking-widest font-display mb-3">
-            <Sparkles className="h-3 w-3 animate-pulse" />
-            CSS Studio Engine
-          </div>
-          <h1 className="text-3xl md:text-4xl font-black tracking-tight font-display text-white mt-1">
-            BACKGROUND <span className="text-violet-400">PATTERNS</span> GENERATOR
-          </h1>
-          <p className="text-slate-400 text-sm mt-2 max-w-2xl leading-relaxed">
-            Architect custom grids, blueprint meshes, waves, and diagonal stripe background textures. Combine linear gradients and inlined SVGs into performant css assets instantly.
-          </p>
-        </div>
-
-        {/* Global Action Reset */}
-        <div className="z-10 flex flex-col justify-center">
-          <button 
-            onClick={resetAllValues}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-800 bg-slate-900/80 hover:bg-slate-850 hover:border-slate-700 text-slate-300 text-xs font-black uppercase tracking-widest font-display shadow-md transition-all cursor-pointer"
-          >
-            <RotateCcw className="h-3.5 w-3.5 text-violet-400" />
-            Reset Design
-          </button>
-        </div>
-      </div>
-
       {/* Modern Palette Color Schemes Pickers */}
-      <div className="mb-8 bg-white dark:bg-slate-950 border-2 border-slate-150 dark:border-slate-850 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="mb-8 bg-white dark:bg-slate-950 border-2 border-slate-150 dark:border-slate-850 rounded-3xl p-4.5 shadow-sm flex flex-col lg:flex-row lg:items-center justify-between gap-4">
         <div className="flex items-center gap-2.5">
           <Palette className="h-5 w-5 text-violet-600 dark:text-violet-400" />
           <div>
@@ -419,29 +389,39 @@ export default function PatternBackground() {
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          {COLOR_PRESETS.map((preset, idx) => (
-            <button
-              key={preset.name}
-              onClick={() => loadColorPreset(idx)}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border-2 text-[10.5px] font-extrabold uppercase tracking-wider font-display transition-all cursor-pointer ${
-                activeColorPreset === idx
-                  ? 'border-violet-600 bg-violet-50/20 dark:bg-violet-950/20 text-violet-750 dark:text-violet-400'
-                  : 'border-slate-200 hover:border-slate-300 dark:border-slate-850 dark:hover:border-slate-800 text-slate-600 dark:text-slate-400'
-              }`}
-            >
-              <div className="flex items-center gap-1">
-                <span className="w-3.5 h-3.5 rounded border border-white/20" style={{ backgroundColor: preset.bgColor }} />
-                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: preset.patternColor }} />
-              </div>
-              <span>{preset.name}</span>
-            </button>
-          ))}
+        <div className="flex flex-wrap lg:flex-nowrap items-center gap-3 w-full lg:w-auto justify-between lg:justify-end">
+          <div className="flex flex-wrap gap-2">
+            {COLOR_PRESETS.map((preset, idx) => (
+              <button
+                key={preset.name}
+                onClick={() => loadColorPreset(idx)}
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border-2 text-[10.5px] font-extrabold uppercase tracking-wider font-display transition-all cursor-pointer ${
+                  activeColorPreset === idx
+                    ? 'border-violet-600 bg-violet-50/20 dark:bg-violet-950/20 text-violet-750 dark:text-violet-400'
+                    : 'border-slate-200 hover:border-slate-300 dark:border-slate-850 dark:hover:border-slate-800 text-slate-600 dark:text-slate-400'
+                }`}
+              >
+                <div className="flex items-center gap-1">
+                  <span className="w-3.5 h-3.5 rounded border border-white/20" style={{ backgroundColor: preset.bgColor }} />
+                  <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: preset.patternColor }} />
+                </div>
+                <span>{preset.name}</span>
+              </button>
+            ))}
+          </div>
+
+          <button 
+            onClick={resetAllValues}
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-rose-200 hover:border-rose-300 dark:border-rose-950/40 bg-rose-50/50 hover:bg-rose-100/50 dark:bg-rose-950/20 text-rose-650 dark:text-rose-400 text-[10.5px] font-black uppercase tracking-wider font-display transition-all cursor-pointer shrink-0"
+          >
+            <RotateCcw className="h-3 w-3" />
+            Reset Design
+          </button>
         </div>
       </div>
 
       {/* Main Workspace Dashboard Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         {/* LEFT COLUMN: Controls Dashboard */}
         <div className="lg:col-span-5 space-y-6">
@@ -697,8 +677,8 @@ export default function PatternBackground() {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Interactive live canvas & design centers */}
-        <div className="lg:col-span-7 space-y-6">
+        {/* RIGHT COLUMN: PREVIEW STAGE & CODE EXPORTERS */}
+        <div className="lg:col-span-7 space-y-6 lg:sticky lg:top-24">
           
           {/* Real-time Interactive Preview Stage */}
           <div className="bg-white dark:bg-slate-950 border-2 border-slate-150 dark:border-slate-850 rounded-3xl p-5 shadow-sm space-y-4">
@@ -906,87 +886,92 @@ export default function PatternBackground() {
 
           </div>
 
-          {/* EXPORTING CODE MODULE */}
-          <div className="bg-white dark:bg-slate-950 border-2 border-slate-150 dark:border-slate-850 rounded-3xl p-6 shadow-sm">
-            
-            <div className="flex items-center justify-between mb-4 border-b border-slate-100 dark:border-slate-850 pb-3">
-              <div className="flex items-center gap-2">
-                <FolderSync className="h-4.5 w-4.5 text-violet-600 dark:text-violet-400" />
-                <h3 className="text-md font-black uppercase tracking-wider font-display text-slate-800 dark:text-white">
-                  Export Crafted Pattern Style
-                </h3>
-              </div>
+        </div>
 
-              <div className="flex rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-150 dark:border-slate-850 p-1">
-                {(['css', 'tailwind', 'react', 'svg'] as const).map((tab) => (
-                  <button
-                    key={tab}
-                    onClick={() => setActiveCodeTab(tab)}
-                    className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider font-display rounded-lg transition-all cursor-pointer ${
-                      activeCodeTab === tab
-                        ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm'
-                        : 'text-slate-500 hover:text-slate-750'
-                    }`}
-                  >
-                    {tab}
-                  </button>
-                ))}
-              </div>
-            </div>
+      </div>
 
-            {/* Dynamically compiled copy clipboard code block */}
-            <div className="relative rounded-2xl bg-slate-950 p-5 mt-4 min-h-[140px] border border-slate-850 overflow-x-auto">
-              
-              {/* Copy action key */}
-              <button
-                onClick={() => {
-                  const targetCode = activeCodeTab === 'css' 
-                    ? getCssCodeString() 
-                    : activeCodeTab === 'tailwind' 
-                    ? getTailwindCodeString() 
-                    : activeCodeTab === 'react' 
-                    ? getReactCodeString() 
-                    : getSvgRawCodeString();
-                  copyToClipboard(targetCode, activeCodeTab);
-                }}
-                className="absolute top-4 right-4 p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 hover:border-slate-700 text-slate-350 cursor-pointer transition-all z-10 flex items-center gap-1.5"
-              >
-                {copiedText === activeCodeTab ? (
-                  <>
-                    <Check className="h-4.5 w-4.5 text-emerald-500" />
-                    <span className="text-[10px] font-black uppercase text-emerald-500 font-display">Copied!</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="h-4.5 w-4.5 text-indigo-400" />
-                    <span className="text-[10px] font-black uppercase font-display text-slate-300">Copy Code</span>
-                  </>
-                )}
-              </button>
-
-              {/* Code print */}
-              <pre className="text-xs font-mono font-bold text-slate-300 text-left whitespace-pre select-all pt-4">
-                {activeCodeTab === 'css' && getCssCodeString()}
-                {activeCodeTab === 'tailwind' && getTailwindCodeString()}
-                {activeCodeTab === 'react' && getReactCodeString()}
-                {activeCodeTab === 'svg' && getSvgRawCodeString()}
-              </pre>
-
-            </div>
-
-            {/* Informational Help Alert Description */}
-            <div className="mt-4 p-4 rounded-2xl bg-indigo-50/50 dark:bg-slate-900/40 border border-indigo-100/50 dark:border-slate-850 text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed flex gap-3">
-              <BadgeInfo className="h-5 w-5 text-indigo-500 shrink-0 mt-0.5" />
-              <div>
-                <p className="font-bold text-slate-850 dark:text-slate-300 mb-0.5">Performance Optimized Assets</p>
-                <p>
-                  Linear gradients and vector Base64-encoded SVG background images are compiled natively inside standard CSS without triggering additional network HTTP overhead. Perfect for performance-sensitive landing pages and fluid styling utilities.
-                </p>
-              </div>
-            </div>
-
+      {/* CODE EXPORTER PANEL - Full Width 12-column Section */}
+      <div className="bg-white dark:bg-slate-950 border-2 border-slate-205 dark:border-slate-800 rounded-3xl p-6 shadow-sm overflow-hidden animate-fade-in mt-8" id="pattern-exporter">
+        
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-5 pb-3 border-b border-slate-100 dark:border-slate-800">
+          <div className="flex items-center gap-2">
+            <FolderSync className="h-4.5 w-4.5 text-indigo-500" />
+            <h3 className="text-md font-black uppercase tracking-wider font-display text-slate-800 dark:text-white">
+              Export Crafted Pattern Style
+            </h3>
           </div>
 
+          {/* Code format toggle buttons */}
+          <div className="flex rounded-xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-1">
+            {[
+              { id: 'css', label: 'Standard CSS' },
+              { id: 'tailwind', label: 'Tailwind CSS' },
+              { id: 'react', label: 'React Inline' },
+              { id: 'svg', label: 'Vector SVG' }
+            ].map((recipeTab) => (
+              <button
+                key={recipeTab.id}
+                onClick={() => setActiveCodeTab(recipeTab.id as any)}
+                className={`px-3 py-1 text-[10px] font-black uppercase tracking-wider font-display rounded-lg transition-all cursor-pointer ${
+                  activeCodeTab === recipeTab.id
+                    ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'
+                }`}
+              >
+                {recipeTab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Code presentation stage */}
+        <div className="relative rounded-2xl bg-slate-950 p-5 mt-4 min-h-[140px] border border-slate-800 overflow-x-auto animate-fade-in animate-duration-150">
+          
+          {/* Float Copy Button */}
+          <button
+            onClick={() => {
+              const targetCode = activeCodeTab === 'css' 
+                ? getCssCodeString() 
+                : activeCodeTab === 'tailwind' 
+                ? getTailwindCodeString() 
+                : activeCodeTab === 'react' 
+                ? getReactCodeString() 
+                : getSvgRawCodeString();
+              copyToClipboard(targetCode, activeCodeTab);
+            }}
+            className="absolute top-4 right-4 p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 hover:border-slate-700 text-slate-400 cursor-pointer transition-all z-10 flex items-center gap-1.5"
+          >
+            {copiedText === activeCodeTab ? (
+              <>
+                <Check className="h-4.5 w-4.5 text-emerald-500" />
+                <span className="text-[10px] font-black uppercase text-emerald-500 font-display font-bold">Copied!</span>
+              </>
+            ) : (
+              <>
+                <Copy className="h-4.5 w-4.5 text-indigo-400" />
+                <span className="text-[10px] font-black uppercase font-display text-slate-300 font-bold">Copy Code</span>
+              </>
+            )}
+          </button>
+
+          {/* Print Code segment */}
+          <pre className="text-xs font-mono font-bold text-slate-300 text-left whitespace-pre select-all pt-4 leading-normal max-h-[350px] scrollbar-thin">
+            {activeCodeTab === 'css' && getCssCodeString()}
+            {activeCodeTab === 'tailwind' && getTailwindCodeString()}
+            {activeCodeTab === 'react' && getReactCodeString()}
+            {activeCodeTab === 'svg' && getSvgRawCodeString()}
+          </pre>
+        </div>
+
+        {/* Design info/warning tip */}
+        <div className="flex gap-3 items-start bg-slate-50 dark:bg-slate-950 p-4 rounded-xl border border-slate-150 dark:border-slate-850 mt-4">
+          <BadgeInfo className="h-4.5 w-4.5 text-indigo-500 shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <h5 className="text-[11px] font-bold text-slate-850 dark:text-slate-205 uppercase tracking-wider font-display font-medium">Volumetric Geometric Layout Architecture</h5>
+            <p className="text-[10.5px] text-slate-550 dark:text-slate-450 leading-relaxed font-display">
+              Vector Base64 SVG modules and custom gradient arrays compile instantly inside modern stylesheets. Apply standard CSS background declarations to eliminate additional asset network loading latency.
+            </p>
+          </div>
         </div>
 
       </div>
